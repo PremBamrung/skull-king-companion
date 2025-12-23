@@ -39,6 +39,7 @@ class GameRead(BaseModel):
     id: UUID
     status: GameStatus
     created_at: datetime
+    last_accessed: datetime
     rules_config: Dict
     players: List[PlayerRead] = []
     rounds: List[RoundRead] = []
@@ -111,6 +112,12 @@ def get_game(game_id: UUID, session: Session = Depends(get_session)):
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
+    # Update last accessed
+    game.last_accessed = datetime.utcnow()
+    session.add(game)
+    session.commit()
+    session.refresh(game)
+    
     # Ensure players and rounds are loaded (SQLModel Relationship handles this)
     return game
 
@@ -178,8 +185,9 @@ def submit_round(
         session.add(next_round)
     else:
         game.status = GameStatus.COMPLETED
-        session.add(game)
-    
+
+    game.last_accessed = datetime.utcnow()
+    session.add(game)
     session.commit()
     session.refresh(game)
     return game
@@ -238,6 +246,10 @@ def update_round(
     
     session.commit()
     
+    game.last_accessed = datetime.utcnow()
+    session.add(game)
+    session.commit()
+
     # RE-CALCULATE ALL SUBSEQUENT ROUNDS
     for r_num in range(round_num + 1, 11):
         statement = select(Round).where(Round.game_id == game_id, Round.round_number == r_num)
@@ -287,7 +299,7 @@ def undo_round(game_id: UUID, round_num: int, session: Session = Depends(get_ses
 
 @app.get("/api/history", response_model=List[GameRead])
 def get_history(session: Session = Depends(get_session)):
-    statement = select(Game).order_by(Game.created_at.desc())
+    statement = select(Game).order_by(Game.last_accessed.desc())
     return session.exec(statement).all()
 
 @app.delete("/api/games/{game_id}")

@@ -342,7 +342,7 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                       </div>
                       <div>
                         <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
-                          {new Date(g.created_at).toLocaleDateString()}
+                          {new Date(g.last_accessed).toLocaleString()}
                         </p>
                         <p className="text-xs text-brand-slate uppercase tracking-wider font-bold">{g.status}</p>
                       </div>

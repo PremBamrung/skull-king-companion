@@ -15,6 +15,7 @@ class Game(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     status: GameStatus = Field(default=GameStatus.SETUP)
     created_at: datetime = Field(default_factory=datetime.utcnow)
+    last_accessed: datetime = Field(default_factory=datetime.utcnow)
     rules_config: Dict = Field(default={}, sa_column=Column(JSON))
     
     players: List["Player"] = Relationship(back_populates="game", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
