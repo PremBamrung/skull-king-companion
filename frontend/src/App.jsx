@@ -749,6 +749,17 @@ function GameLoop({ game, onExit, setGame }) {
 }
 
 function Leaderboard({ game, compact = false, onEditRound }) {
+  const [expandedRounds, setExpandedRounds] = React.useState({});
+
+  const toggleRound = (roundNum) => {
+    setExpandedRounds(prev => ({
+      ...prev,
+      [roundNum]: !prev[roundNum]
+    }));
+  };
+
+  const isGameCompleted = game.status === 'COMPLETED';
+
   // Calculate standings
   const standings = game.players.map(p => {
     const total = game.rounds.reduce((acc, r) => {
@@ -786,15 +797,90 @@ function Leaderboard({ game, compact = false, onEditRound }) {
           <h3 className="text-brand-navy font-bold mb-4 flex items-center gap-2 font-serif text-sm">
             <RotateCcw size={16} className="text-brand-teal" /> Voyage History
           </h3>
-          <div className="space-y-2">
-            {game.rounds.filter(r => r.player_stats?.length > 0).map(r => (
-              <div key={r.id} className="flex items-center justify-between p-3 bg-brand-navy/5 rounded-lg border border-brand-charcoal/5">
-                <span className="font-bold text-brand-navy">Round {r.round_number}</span>
-                <Button variant="ghost" size="sm" onClick={() => onEditRound(r)} className="text-brand-slate hover:text-brand-teal">
-                  <Edit size={16} className="mr-2" /> Edit
-                </Button>
-              </div>
-            ))}
+          <div className="space-y-3">
+            {game.rounds.filter(r => r.player_stats?.length > 0).sort((a,b) => b.round_number - a.round_number).map(r => {
+              const isExpanded = expandedRounds[r.round_number] || isGameCompleted;
+              
+              return (
+                <div key={r.id} className="bg-brand-navy/5 rounded-xl border border-brand-charcoal/5 overflow-hidden transition-all">
+                  <div 
+                    onClick={() => !isGameCompleted && toggleRound(r.round_number)}
+                    className={cn(
+                      "flex items-center justify-between p-3 cursor-pointer hover:bg-brand-navy/10 transition-colors",
+                      isGameCompleted && "cursor-default hover:bg-brand-navy/5"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-brand-navy font-serif">Round {r.round_number}</span>
+                      {!isGameCompleted && (
+                        <div className={cn("transition-transform duration-200", isExpanded ? "rotate-90" : "")}>
+                          <ChevronRight size={14} className="text-brand-slate" />
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="flex items-center gap-4">
+                      {/* Compact summary when collapsed */}
+                      {!isExpanded && (
+                        <div className="flex -space-x-1 items-center">
+                          {r.player_stats.map(s => {
+                            const success = s.bid === s.tricks_won;
+                            return (
+                              <div 
+                                key={s.player_id}
+                                title={`${game.players.find(p => p.id === s.player_id)?.name}: ${s.round_score} pts`}
+                                className={cn(
+                                  "w-5 h-5 rounded-full border border-white flex items-center justify-center text-[8px] font-bold text-white",
+                                  success ? "bg-suit-green" : "bg-brand-oxblood"
+                                )}
+                              >
+                                {s.round_score > 0 ? "+" : ""}{s.round_score}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                      <Button variant="ghost" size="sm" onClick={(e) => { e.stopPropagation(); onEditRound(r); }} className="text-brand-slate hover:text-brand-teal h-8 w-8 p-0">
+                        <Edit size={14} />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {isExpanded && (
+                    <div className="px-3 pb-3 pt-1 animate-in fade-in slide-in-from-top-1 duration-200">
+                      <div className="grid grid-cols-1 gap-2">
+                        {r.player_stats.map(s => {
+                          const player = game.players.find(p => p.id === s.player_id);
+                          const success = s.bid === s.tricks_won;
+                          return (
+                            <div key={s.player_id} className="flex items-center justify-between text-xs bg-white/50 p-2 rounded-lg border border-brand-charcoal/5">
+                              <div className="flex items-center gap-2">
+                                <div className={cn("w-2 h-2 rounded-full", success ? "bg-suit-green" : "bg-brand-oxblood")} />
+                                <span className="font-bold text-brand-navy truncate max-w-[80px]">{player?.name}</span>
+                              </div>
+                              <div className="flex items-center gap-3 font-mono">
+                                <div className="flex items-center gap-1 text-brand-slate">
+                                  <span className="font-bold text-brand-navy">{s.tricks_won}</span>
+                                  <span>/</span>
+                                  <span>{s.bid}</span>
+                                  <Target size={10} className="ml-0.5 opacity-50" />
+                                </div>
+                                {s.bonus_points > 0 && (
+                                  <div className="text-suit-yellow font-bold">+{s.bonus_points}</div>
+                                )}
+                                <div className={cn("font-bold min-w-[30px] text-right", s.round_score >= 0 ? "text-suit-green" : "text-brand-oxblood")}>
+                                  {s.round_score > 0 ? "+" : ""}{s.round_score}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </Card>
       )}
