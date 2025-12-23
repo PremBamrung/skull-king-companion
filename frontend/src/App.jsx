@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 
 // --- SCORE GRAPH COMPONENT ---
-const ScoreGraph = ({ game }) => {
+const ScoreGraph = ({ game, variant = 'sidebar' }) => {
   const data = game.rounds
     .filter(r => r.player_stats && r.player_stats.length > 0)
     .map(r => {
@@ -26,35 +26,64 @@ const ScoreGraph = ({ game }) => {
   if (data.length === 0) return null;
 
   const colors = ['#0D9488', '#991B1B', '#EAB308', '#7C3AED', '#2563EB', '#D97706'];
+  const isHero = variant === 'hero';
 
   return (
-    <Card className="p-4 h-64 w-full">
-      <h3 className="text-brand-navy font-bold mb-4 flex items-center gap-2 font-serif text-sm">
+    <Card className={cn("p-4 w-full flex flex-col gap-4 overflow-hidden", isHero ? "h-[500px]" : "h-80")}>
+      <h3 className="text-brand-navy font-bold flex items-center gap-2 font-serif text-sm shrink-0">
         <LineChart size={16} className="text-brand-teal" /> Point Progression
       </h3>
-      <ResponsiveContainer width="100%" height="100%">
-        <ReChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-          <XAxis dataKey="name" fontSize={12} tick={{ fill: '#4b5563' }} />
-          <YAxis fontSize={12} tick={{ fill: '#4b5563' }} />
-          <Tooltip 
-            contentStyle={{ backgroundColor: '#fdfcf0', borderRadius: '8px', border: '1px solid #e5e7eb' }}
-            itemStyle={{ fontWeight: 'bold' }}
-          />
-          <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
-          {game.players.map((p, i) => (
-            <Line 
-              key={p.id} 
-              type="monotone" 
-              dataKey={p.name} 
-              stroke={colors[i % colors.length]} 
-              strokeWidth={3}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+      
+      <div className="flex-1 min-h-0">
+        <ResponsiveContainer width="100%" height="100%">
+          <ReChart data={data} margin={{ top: 10, right: 15, left: -25, bottom: 25 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+            <XAxis 
+              dataKey="name" 
+              fontSize={10} 
+              tick={{ fill: '#4b5563', fontWeight: 600 }} 
+              axisLine={false}
+              tickLine={false}
+              interval={0}
+              dy={10}
             />
-          ))}
-        </ReChart>
-      </ResponsiveContainer>
+            <YAxis 
+              fontSize={10} 
+              tick={{ fill: '#4b5563', fontWeight: 600 }} 
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#fdfcf0', borderRadius: '8px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+              itemStyle={{ fontWeight: 'bold', fontSize: '12px' }}
+            />
+            {game.players.map((p, i) => (
+              <Line 
+                key={p.id} 
+                type="monotone" 
+                dataKey={p.name} 
+                stroke={colors[i % colors.length]} 
+                strokeWidth={isHero ? 4 : 3}
+                dot={{ r: isHero ? 4 : 3, fill: colors[i % colors.length], strokeWidth: 2, stroke: '#fff' }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+                animationDuration={1000}
+              />
+            ))}
+          </ReChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Custom Legend UI */}
+      <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 px-4 py-3 border-t border-brand-charcoal/5 shrink-0 bg-brand-navy/5 -mx-4 -mb-4">
+        {game.players.map((p, i) => (
+          <div key={p.id} className="flex items-center gap-2">
+            <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: colors[i % colors.length] }} />
+            <span className="text-[10px] font-bold text-brand-navy truncate max-w-[100px]">
+              {p.name}
+            </span>
+          </div>
+        ))}
+      </div>
     </Card>
   );
 };
@@ -453,26 +482,29 @@ function GameLoop({ game, onExit, setGame }) {
     })[0];
 
     return (
-      <div className="text-center space-y-8 animate-in zoom-in duration-500 pt-12">
-        <div className="relative inline-block group">
-          <div className="absolute inset-0 bg-brand-teal blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
-          <Trophy size={120} className="text-suit-yellow relative z-10 mx-auto drop-shadow-2xl" />
-        </div>
+      <div className="max-w-6xl mx-auto space-y-12 animate-in zoom-in duration-500 pt-12">
+        <div className="text-center space-y-8">
+          <div className="relative inline-block group">
+            <div className="absolute inset-0 bg-brand-teal blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
+            <Trophy size={120} className="text-suit-yellow relative z-10 mx-auto drop-shadow-2xl" />
+          </div>
 
-            <div>
-                <h2 className="text-4xl md:text-6xl font-bold text-brand-navy mb-6 tracking-tight drop-shadow-md font-serif">Captain of the Seas</h2>
-                <div className="text-4xl md:text-5xl text-white font-bold bg-brand-navy inline-block px-12 py-6 rounded-3xl border border-brand-teal/20 shadow-2xl transform hover:scale-105 transition-transform">
-                    {leader?.name}
-                </div>
-                <div className="mt-8 flex justify-center gap-4">
-                     <Button onClick={onExit} variant="secondary">Return to Port</Button>
-                </div>
+          <div>
+            <h2 className="text-4xl md:text-6xl font-bold text-brand-navy mb-6 tracking-tight drop-shadow-md font-serif">Captain of the Seas</h2>
+            <div className="text-4xl md:text-5xl text-white font-bold bg-brand-navy inline-block px-12 py-6 rounded-3xl border border-brand-teal/20 shadow-2xl transform hover:scale-105 transition-transform">
+              {leader?.name}
             </div>
-
-            <ScoreGraph game={game} />
-
-            <Leaderboard game={game} onEditRound={startEditRound} />
+            <div className="mt-8 flex justify-center gap-4">
+              <Button onClick={onExit} variant="secondary">Return to Port</Button>
+            </div>
+          </div>
         </div>
+
+        <div className="grid grid-cols-1 gap-8">
+          <ScoreGraph game={game} variant="hero" />
+          <Leaderboard game={game} onEditRound={startEditRound} />
+        </div>
+      </div>
     );
   }
 
@@ -709,7 +741,7 @@ function GameLoop({ game, onExit, setGame }) {
                  )}
             </Card>
             
-            <ScoreGraph game={game} />
+            <ScoreGraph game={game} variant="sidebar" />
             <Leaderboard game={game} onEditRound={startEditRound} />
         </aside>
     </div>
