@@ -19,4 +19,4 @@ services:
       - ./backend:/app
       - ./data:/app/data
     environment:
-      - DATABASE_URL=sqlite:///app/data/skullking.db
+      - DATABASE_URL=sqlite:////app/data/skullking.db
