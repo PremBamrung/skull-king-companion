@@ -4,8 +4,60 @@ import { api } from './api';
 import { Button, Card, Input, Badge, cn } from './components/UI';
 import {
   Skull, Anchor, Scroll, Trophy, Users, ChevronRight, Minus, Plus,
-  HelpCircle, X, Swords, Crown, RotateCcw, Info
+  HelpCircle, X, Swords, Crown, RotateCcw, Info, Trash2, Home, LineChart, Edit
 } from 'lucide-react';
+import {
+  LineChart as ReChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
+
+// --- SCORE GRAPH COMPONENT ---
+const ScoreGraph = ({ game }) => {
+  const data = game.rounds
+    .filter(r => r.player_stats && r.player_stats.length > 0)
+    .map(r => {
+      const entry = { name: `R${r.round_number}` };
+      r.player_stats.forEach(s => {
+        const playerName = game.players.find(p => p.id === s.player_id)?.name || 'Unknown';
+        entry[playerName] = s.total_score_snapshot;
+      });
+      return entry;
+    });
+
+  if (data.length === 0) return null;
+
+  const colors = ['#0D9488', '#991B1B', '#EAB308', '#7C3AED', '#2563EB', '#D97706'];
+
+  return (
+    <Card className="p-4 h-64 w-full">
+      <h3 className="text-brand-navy font-bold mb-4 flex items-center gap-2 font-serif text-sm">
+        <LineChart size={16} className="text-brand-teal" /> Point Progression
+      </h3>
+      <ResponsiveContainer width="100%" height="100%">
+        <ReChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis dataKey="name" fontSize={12} tick={{ fill: '#4b5563' }} />
+          <YAxis fontSize={12} tick={{ fill: '#4b5563' }} />
+          <Tooltip 
+            contentStyle={{ backgroundColor: '#fdfcf0', borderRadius: '8px', border: '1px solid #e5e7eb' }}
+            itemStyle={{ fontWeight: 'bold' }}
+          />
+          <Legend iconType="circle" wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }} />
+          {game.players.map((p, i) => (
+            <Line 
+              key={p.id} 
+              type="monotone" 
+              dataKey={p.name} 
+              stroke={colors[i % colors.length]} 
+              strokeWidth={3}
+              dot={{ r: 4 }}
+              activeDot={{ r: 6 }}
+            />
+          ))}
+        </ReChart>
+      </ResponsiveContainer>
+    </Card>
+  );
+};
 
 // --- RULES MODAL (Ported from old_frontend.jsx) ---
 const RulesModal = ({ onClose }) => (
@@ -64,6 +116,26 @@ const RulesModal = ({ onClose }) => (
             </div>
           </div>
         </section>
+
+        <section className="md:col-span-2">
+            <h3 className="text-brand-oxblood font-bold text-xl mb-4 flex items-center gap-2 border-b border-brand-charcoal/10 pb-2 font-serif"><Info size={18} /> Gameplay & Rules</h3>
+            <div className="bg-brand-navy/5 p-6 rounded-xl border border-brand-charcoal/5 space-y-4 text-sm leading-relaxed">
+                <p>
+                    <strong>The Goal:</strong> Predict exactly how many tricks you will win each round. 
+                    The game lasts 10 rounds. In round 1, you have 1 card; in round 10, you have 10 cards.
+                </p>
+                <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                        <p><strong>Bidding:</strong> All players simultaneously pound their fists 3 times and shout "Yo-Ho-Ho!", then extend fingers to show their bid.</p>
+                        <p><strong>Playing Tricks:</strong> The first player leads a card. Others must follow suit if possible. If you can't follow suit, you can play any other card (including trump or special cards).</p>
+                    </div>
+                    <div className="space-y-2">
+                        <p><strong>Special Cards:</strong> Special cards (Pirates, Mermaid, Skull King) can be played at any time, even if you could follow suit.</p>
+                        <p><strong>The Kraken:</strong> If played, the entire trick is destroyed. No one wins it. The next trick starts with the same person who started the Kraken trick.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
       </div>
     </div>
   </div>
@@ -75,19 +147,17 @@ export default function App() {
   const [view, setView] = useState('LOBBY'); // LOBBY, SETUP, PLAY
   const [showRules, setShowRules] = useState(false);
 
-  useEffect(() => {
-    // If game exists in state but we're in LOBBY or SETUP, move to PLAY
-    if (game && (view === 'LOBBY' || view === 'SETUP')) {
-      setView('PLAY');
-    }
-  }, [game, view]);
-
   const handleNewVoyage = () => setView('SETUP');
+  
+  const handleSelectGame = (g) => {
+    setGame(g);
+    setView('PLAY');
+  };
 
   return (
     <div className="min-h-screen bg-brand-parchment text-brand-charcoal pb-12 font-sans">
       {showRules && <RulesModal onClose={() => setShowRules(false)} />}
-      
+
       {/* Header */}
       <header className="sticky top-0 z-30 bg-brand-navy text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
@@ -100,14 +170,30 @@ export default function App() {
               <p className="text-brand-teal text-xs font-sans tracking-widest uppercase font-bold">Companion</p>
             </div>
           </div>
-          <Button variant="ghost" onClick={() => setShowRules(true)} className="text-white hover:text-brand-teal">
-             <HelpCircle size={24} />
-          </Button>
+
+          <div className="flex items-center gap-2">
+            {view === 'PLAY' && (
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  if (window.confirm('Return to home screen? Game progress will be saved.')) {
+                    setView('LOBBY');
+                  }
+                }}
+                className="text-white hover:text-brand-teal"
+              >
+                <Home size={24} />
+              </Button>
+            )}
+            <Button variant="ghost" onClick={() => setShowRules(true)} className="text-white hover:text-brand-teal">
+              <HelpCircle size={24} />
+            </Button>
+          </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto p-4 md:p-6 relative z-10">
-        {view === 'LOBBY' && <Lobby onNewVoyage={handleNewVoyage} setGame={setGame} />}
+        {view === 'LOBBY' && <Lobby onNewVoyage={handleNewVoyage} onSelectGame={handleSelectGame} />}
         {view === 'SETUP' && <Setup onBack={() => setView('LOBBY')} onStart={(g) => { setGame(g); setView('PLAY'); }} />}
         {view === 'PLAY' && <GameLoop game={game} onExit={() => { clearGame(); setView('LOBBY'); }} setGame={setGame} />}
       </div>
@@ -117,12 +203,22 @@ export default function App() {
 
 // --- SUB-COMPONENTS ---
 
-function Lobby({ onNewVoyage, setGame }) {
+function Lobby({ onNewVoyage, onSelectGame }) {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    api.getHistory().then(setHistory);
+    loadHistory();
   }, []);
+
+  const loadHistory = () => api.getHistory().then(setHistory);
+
+  const deleteGame = async (id, e) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to sink this ship? (Delete game)')) {
+      await api.deleteGame(id);
+      loadHistory();
+    }
+  };
 
   return (
     <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12 text-center">
@@ -145,18 +241,31 @@ function Lobby({ onNewVoyage, setGame }) {
           </h3>
           <div className="space-y-3">
             {history.map((g) => (
-              <div 
-                key={g.id} 
-                onClick={() => setGame(g)}
+              <div
+                key={g.id}
+                onClick={() => onSelectGame(g)}
                 className="bg-white hover:bg-brand-navy/5 border border-brand-slate/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
               >
-                <div>
-                  <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
-                    {new Date(g.created_at).toLocaleDateString()}
-                  </p>
-                  <p className="text-sm text-brand-slate">{g.status}</p>
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-lg bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-teal/10 group-hover:text-brand-teal transition-colors">
+                    <Anchor size={20} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
+                      {new Date(g.created_at).toLocaleDateString()}
+                    </p>
+                    <p className="text-xs text-brand-slate uppercase tracking-wider font-bold">{g.status}</p>
+                  </div>
                 </div>
-                <ChevronRight className="text-brand-slate/40 group-hover:text-brand-teal" />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => deleteGame(g.id, e)}
+                    className="p-2 text-brand-slate/40 hover:text-brand-oxblood hover:bg-brand-oxblood/5 rounded-lg transition-all"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                  <ChevronRight className="text-brand-slate/40 group-hover:text-brand-teal" />
+                </div>
               </div>
             ))}
           </div>
@@ -242,6 +351,7 @@ function Setup({ onBack, onStart }) {
 
 function GameLoop({ game, onExit, setGame }) {
   const [localPhase, setLocalPhase] = useState('BID'); // BID, RESOLUTION
+  const [editingRoundNum, setEditingRoundNum] = useState(null);
   const [bids, setBids] = useState({});
   const [tricks, setTricks] = useState({});
   const [bonuses, setBonuses] = useState({});
@@ -282,20 +392,42 @@ function GameLoop({ game, onExit, setGame }) {
   }, [currentRound.id]);
 
   const submitGameRound = async () => {
-      try {
-        const stats = game.players.map(p => ({
-          player_id: p.id,
-          bid: bids[p.id] || 0,
-          tricks: tricks[p.id] || 0,
-          bonus: bonuses[p.id] || 0
-        }));
-        const updated = await api.submitRound(game.id, currentRound.round_number, stats, kraken);
-        setGame(updated);
-        // After submit, we are either in next round or game over.
-        // If game over, updated game status will be 'COMPLETED'.
-      } catch (e) {
-        alert(e.response?.data?.detail || 'Error submitting round');
+    try {
+      const stats = game.players.map(p => ({
+        player_id: p.id,
+        bid: bids[p.id] || 0,
+        tricks: tricks[p.id] || 0,
+        bonus: bonuses[p.id] || 0
+      }));
+
+      let updated;
+      if (editingRoundNum) {
+        updated = await api.updateRound(game.id, editingRoundNum, stats, kraken);
+        setEditingRoundNum(null);
+      } else {
+        updated = await api.submitRound(game.id, currentRound.round_number, stats, kraken);
       }
+      setGame(updated);
+    } catch (e) {
+      alert(e.response?.data?.detail || 'Error submitting round');
+    }
+  };
+
+  const startEditRound = (round) => {
+    setEditingRoundNum(round.round_number);
+    const newBids = {};
+    const newTricks = {};
+    const newBonuses = {};
+    round.player_stats.forEach(s => {
+      newBids[s.player_id] = s.bid;
+      newTricks[s.player_id] = s.tricks_won;
+      newBonuses[s.player_id] = s.bonus_points;
+    });
+    setBids(newBids);
+    setTricks(newTricks);
+    setBonuses(newBonuses);
+    setLocalPhase('RESOLUTION'); // Direct to resolution for editing
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
   
   const undoLast = async () => {
@@ -312,18 +444,18 @@ function GameLoop({ game, onExit, setGame }) {
   
   // 1. GAME OVER VIEW
   if (game.status === 'COMPLETED') {
-     const leader = [...game.players].sort((a,b) => {
-         const scoreA = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s=>s.player_id===a.id)?.round_score || 0), 0);
-         const scoreB = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s=>s.player_id===b.id)?.round_score || 0), 0);
-         return scoreB - scoreA;
-     })[0];
-     
-     return (
-        <div className="text-center space-y-8 animate-in zoom-in duration-500 pt-12">
-            <div className="relative inline-block group">
-                <div className="absolute inset-0 bg-brand-teal blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
-                <Trophy size={120} className="text-suit-yellow relative z-10 mx-auto drop-shadow-2xl" />
-            </div>
+    const leader = [...game.players].sort((a, b) => {
+      const scoreA = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === a.id)?.round_score || 0), 0);
+      const scoreB = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === b.id)?.round_score || 0), 0);
+      return scoreB - scoreA;
+    })[0];
+
+    return (
+      <div className="text-center space-y-8 animate-in zoom-in duration-500 pt-12">
+        <div className="relative inline-block group">
+          <div className="absolute inset-0 bg-brand-teal blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
+          <Trophy size={120} className="text-suit-yellow relative z-10 mx-auto drop-shadow-2xl" />
+        </div>
 
             <div>
                 <h2 className="text-4xl md:text-6xl font-bold text-brand-navy mb-6 tracking-tight drop-shadow-md font-serif">Captain of the Seas</h2>
@@ -334,17 +466,32 @@ function GameLoop({ game, onExit, setGame }) {
                      <Button onClick={onExit} variant="secondary">Return to Port</Button>
                 </div>
             </div>
-            
-             <Leaderboard game={game} />
+
+            <ScoreGraph game={game} />
+
+            <Leaderboard game={game} onEditRound={startEditRound} />
         </div>
-     );
+    );
   }
 
   // 2. ACTIVE GAME VIEW
+  const [showGraph, setShowGraph] = useState(false);
+
   return (
     <div className="grid lg:grid-cols-4 gap-8 items-start">
         {/* MAIN AREA */}
         <main className="lg:col-span-3 space-y-6">
+            <div className="lg:hidden flex justify-end">
+                <Button variant="secondary" size="sm" onClick={() => setShowGraph(!showGraph)}>
+                    <LineChart size={16} className="mr-2" /> {showGraph ? 'Hide Graph' : 'Show Graph'}
+                </Button>
+            </div>
+
+            {showGraph && (
+                <div className="lg:hidden animate-in fade-in slide-in-from-top-4">
+                    <ScoreGraph game={game} />
+                </div>
+            )}
             
             {/* Header for Round */}
             <div className="flex items-center justify-between mb-2">
@@ -531,13 +678,14 @@ function GameLoop({ game, onExit, setGame }) {
                  )}
             </Card>
             
-            <Leaderboard game={game} compact />
+            <ScoreGraph game={game} />
+            <Leaderboard game={game} compact onEditRound={startEditRound} />
         </aside>
     </div>
   );
 }
 
-function Leaderboard({ game, compact = false }) {
+function Leaderboard({ game, compact = false, onEditRound }) {
   // Calculate standings
   const standings = game.players.map(p => {
     const total = game.rounds.reduce((acc, r) => {
@@ -548,25 +696,45 @@ function Leaderboard({ game, compact = false }) {
   }).sort((a, b) => b.total - a.total);
 
   return (
-    <Card className="flex-1 overflow-hidden flex flex-col">
-        <div className="p-4 border-b border-brand-charcoal/5 bg-brand-navy/5">
-            <h3 className="text-brand-oxblood font-bold flex items-center gap-2 font-serif">
-                <Trophy size={16} className="text-brand-teal" /> Leaderboard
-            </h3>
-        </div>
-        <div className="p-2 overflow-y-auto max-h-[500px]">
-            <table className="w-full text-sm">
-                <tbody className="divide-y divide-brand-charcoal/5">
-                    {standings.map((p, i) => (
-                        <tr key={p.id} className="hover:bg-brand-navy/5 transition-colors">
-                            <td className="py-3 px-3 w-8 font-mono text-brand-slate font-bold">{i + 1}</td>
-                            <td className="py-3 px-3 font-bold text-brand-navy font-serif">{p.name}</td>
-                            <td className="py-3 px-3 text-right font-bold text-brand-teal font-mono text-lg">{p.total}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    </Card>
+    <div className="space-y-6">
+      <Card className="flex-1 overflow-hidden flex flex-col">
+          <div className="p-4 border-b border-brand-charcoal/5 bg-brand-navy/5">
+              <h3 className="text-brand-oxblood font-bold flex items-center gap-2 font-serif">
+                  <Trophy size={16} className="text-brand-teal" /> Leaderboard
+              </h3>
+          </div>
+          <div className="p-2 overflow-y-auto max-h-[500px]">
+              <table className="w-full text-sm">
+                  <tbody className="divide-y divide-brand-charcoal/5">
+                      {standings.map((p, i) => (
+                          <tr key={p.id} className="hover:bg-brand-navy/5 transition-colors">
+                              <td className="py-3 px-3 w-8 font-mono text-brand-slate font-bold">{i + 1}</td>
+                              <td className="py-3 px-3 font-bold text-brand-navy font-serif">{p.name}</td>
+                              <td className="py-3 px-3 text-right font-bold text-brand-teal font-mono text-lg">{p.total}</td>
+                          </tr>
+                      ))}
+                  </tbody>
+              </table>
+          </div>
+      </Card>
+
+      {!compact && (
+        <Card className="p-4">
+          <h3 className="text-brand-navy font-bold mb-4 flex items-center gap-2 font-serif text-sm">
+            <RotateCcw size={16} className="text-brand-teal" /> Voyage History
+          </h3>
+          <div className="space-y-2">
+            {game.rounds.filter(r => r.player_stats?.length > 0).map(r => (
+              <div key={r.id} className="flex items-center justify-between p-3 bg-brand-navy/5 rounded-lg border border-brand-charcoal/5">
+                <span className="font-bold text-brand-navy">Round {r.round_number}</span>
+                <Button variant="ghost" size="sm" onClick={() => onEditRound(r)} className="text-brand-slate hover:text-brand-teal">
+                  <Edit size={16} className="mr-2" /> Edit
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+    </div>
   )
 }

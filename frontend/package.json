@@ -1,7 +1,8 @@
 {
   "name": "skull-king-companion",
+  "description": "Companion app for the Skull King card game",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,6 +16,7 @@
     "lucide-react": "^0.284.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "recharts": "^3.6.0",
     "tailwind-merge": "^1.14.0",
     "tailwindcss-animate": "^1.0.7",
     "zustand": "^4.4.3"

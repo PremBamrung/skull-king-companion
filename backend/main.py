@@ -184,6 +184,82 @@ def submit_round(
     session.refresh(game)
     return game
 
+@app.put("/api/games/{game_id}/rounds/{round_num}", response_model=GameRead)
+def update_round(
+    game_id: UUID, 
+    round_num: int, 
+    data: RoundSubmit, 
+    session: Session = Depends(get_session)
+):
+    game = session.get(Game, game_id)
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    statement = select(Round).where(Round.game_id == game_id, Round.round_number == round_num)
+    round_obj = session.exec(statement).first()
+    if not round_obj:
+        raise HTTPException(status_code=404, detail="Round not found")
+
+    # Delete old stats for this round
+    for stat in round_obj.player_stats:
+        session.delete(stat)
+    session.commit()
+    session.refresh(round_obj)
+
+    # Re-submit with new data
+    # (Simplified: we'll just reuse the core logic but without adding a next round)
+    total_tricks = sum(p.tricks for p in data.player_stats)
+    if not data.kraken_played and total_tricks != round_obj.card_count:
+        raise HTTPException(status_code=400, detail="Invalid trick count")
+
+    for p_stat in data.player_stats:
+        score = ScoringService.calculate_score(
+            bid=p_stat.bid, tricks=p_stat.tricks, bonus=p_stat.bonus, 
+            round_cards=round_obj.card_count, rules=game.rules_config
+        )
+        
+        # Get previous total score snapshot
+        prev_total = 0
+        statement = select(RoundPlayerStats).join(Round).where(
+            Round.game_id == game_id,
+            Round.round_number < round_num,
+            RoundPlayerStats.player_id == p_stat.player_id
+        ).order_by(Round.round_number.desc())
+        last_stat = session.exec(statement).first()
+        if last_stat:
+            prev_total = last_stat.total_score_snapshot
+
+        stat_obj = RoundPlayerStats(
+            round_id=round_obj.id, player_id=p_stat.player_id,
+            bid=p_stat.bid, tricks_won=p_stat.tricks, bonus_points=p_stat.bonus,
+            round_score=score, total_score_snapshot=prev_total + score
+        )
+        session.add(stat_obj)
+    
+    session.commit()
+    
+    # RE-CALCULATE ALL SUBSEQUENT ROUNDS
+    for r_num in range(round_num + 1, 11):
+        statement = select(Round).where(Round.game_id == game_id, Round.round_number == r_num)
+        nxt_round = session.exec(statement).first()
+        if not nxt_round or not nxt_round.player_stats:
+            break
+            
+        for s in nxt_round.player_stats:
+            # prev total for THIS player
+            statement = select(RoundPlayerStats).join(Round).where(
+                Round.game_id == game_id,
+                Round.round_number == r_num - 1,
+                RoundPlayerStats.player_id == s.player_id
+            )
+            prev = session.exec(statement).first()
+            s.total_score_snapshot = (prev.total_score_snapshot if prev else 0) + s.round_score
+            session.add(s)
+        session.commit()
+
+    session.refresh(game)
+    return game
+
 @app.delete("/api/games/{game_id}/rounds/{round_num}")
 def undo_round(game_id: UUID, round_num: int, session: Session = Depends(get_session)):
     statement = select(Round).where(Round.game_id == game_id, Round.round_number == round_num)
@@ -213,3 +289,20 @@ def undo_round(game_id: UUID, round_num: int, session: Session = Depends(get_ses
 def get_history(session: Session = Depends(get_session)):
     statement = select(Game).order_by(Game.created_at.desc())
     return session.exec(statement).all()
+
+@app.delete("/api/games/{game_id}")
+def delete_game(game_id: UUID, session: Session = Depends(get_session)):
+    game = session.get(Game, game_id)
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Relationships with cascade delete should be handled by the model, 
+    # but let's be explicit if needed or rely on the DB.
+    # In SQLModel, if we have sa_column_kwargs={"ondelete": "CASCADE"}, it's easier.
+    # For now, let's just delete the game and see. 
+    # Usually, we'd delete rounds and stats first if not cascaded.
+    
+    # Let's check models.py to see cascade settings.
+    session.delete(game)
+    session.commit()
+    return {"message": "Game deleted"}

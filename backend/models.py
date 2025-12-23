@@ -17,8 +17,8 @@ class Game(SQLModel, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     rules_config: Dict = Field(default={}, sa_column=Column(JSON))
     
-    players: List["Player"] = Relationship(back_populates="game")
-    rounds: List["Round"] = Relationship(back_populates="game")
+    players: List["Player"] = Relationship(back_populates="game", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
+    rounds: List["Round"] = Relationship(back_populates="game", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
 
 class Player(SQLModel, table=True):
@@ -29,7 +29,7 @@ class Player(SQLModel, table=True):
     seat_index: int
     
     game: Game = Relationship(back_populates="players")
-    stats: List["RoundPlayerStats"] = Relationship(back_populates="player")
+    stats: List["RoundPlayerStats"] = Relationship(back_populates="player", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
 
 class Round(SQLModel, table=True):
@@ -39,7 +39,7 @@ class Round(SQLModel, table=True):
     card_count: int
     
     game: Game = Relationship(back_populates="rounds")
-    player_stats: List["RoundPlayerStats"] = Relationship(back_populates="round")
+    player_stats: List["RoundPlayerStats"] = Relationship(back_populates="round", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
 
 class RoundPlayerStats(SQLModel, table=True):
