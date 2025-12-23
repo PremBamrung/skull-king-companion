@@ -7,11 +7,11 @@ export function cn(...inputs) {
 }
 
 // --- Card Component ---
-// Uses parchment background with ink text and a subtle wood border
+// Uses modern bone/parchment background with charcoal text and soft shadows
 export const Card = ({ className, children, ...props }) => (
   <div
     className={cn(
-      "bg-parchment text-ink border-2 border-ink/10 rounded-xl shadow-[4px_4px_0px_rgba(43,34,27,0.2)] transition-all",
+      "bg-white text-brand-charcoal border border-brand-slate/10 rounded-xl shadow-xl transition-all",
       className
     )}
     {...props}
@@ -21,14 +21,14 @@ export const Card = ({ className, children, ...props }) => (
 );
 
 // --- Button Component ---
-// Variants: Primary (Gold), Secondary (Wood), Danger (Red), Ghost (Transparent)
+// Variants: Primary (Oxblood), Secondary (Teal), Danger (Red), Ghost (Transparent)
 export const Button = ({ onClick, children, variant = "primary", className = "", disabled = false, ...props }) => {
   const variants = {
-    primary: "bg-highlight-gold hover:bg-[#c5a028] text-ink font-bold shadow-md border-2 border-ink/10",
-    secondary: "bg-wood hover:bg-[#3d3023] text-parchment font-medium border-2 border-parchment/20 shadow-md",
-    danger: "bg-accent-red/10 text-accent-red hover:bg-accent-red/20 border-2 border-accent-red/50",
-    ghost: "text-parchment hover:text-highlight-gold hover:bg-ink/20",
-    icon: "p-2 bg-transparent hover:bg-ink/10 text-ink rounded-full"
+    primary: "bg-brand-oxblood hover:bg-[#8e342c] text-white font-bold shadow-lg transition-all active:translate-y-0.5",
+    secondary: "bg-brand-teal hover:bg-[#006668] text-white font-medium shadow-md transition-all active:translate-y-0.5",
+    danger: "bg-red-50 text-brand-oxblood hover:bg-red-100 border border-brand-oxblood/20",
+    ghost: "text-brand-navy hover:text-brand-teal hover:bg-brand-navy/5",
+    icon: "p-2 bg-transparent hover:bg-brand-navy/5 text-brand-navy rounded-full"
   };
 
   return (
@@ -48,11 +48,11 @@ export const Button = ({ onClick, children, variant = "primary", className = "",
 };
 
 // --- Input Component ---
-// Parchment style input
+// Modern minimalist input
 export const Input = ({ className, ...props }) => (
   <input
     className={cn(
-      "flex h-12 w-full rounded-lg border-2 border-ink/20 bg-parchment px-4 py-2 text-lg text-ink ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-ink/40 focus-visible:outline-none focus-visible:border-highlight-gold focus-visible:ring-1 focus-visible:ring-highlight-gold disabled:cursor-not-allowed disabled:opacity-50 shadow-inner font-bold",
+      "flex h-12 w-full rounded-lg border border-brand-slate/20 bg-white px-4 py-2 text-lg text-brand-charcoal placeholder:text-brand-slate/40 focus:outline-none focus:ring-2 focus:ring-brand-teal/50 focus:border-brand-teal disabled:cursor-not-allowed disabled:opacity-50 transition-all",
       className
     )}
     {...props}
@@ -60,14 +60,14 @@ export const Input = ({ className, ...props }) => (
 );
 
 // --- Badge Component ---
-// For highlighting bits of info
+// Updated with modern suit colors
 export const Badge = ({ className, variant = "default", children, ...props }) => {
   const variants = {
-    default: "bg-wood text-parchment",
-    outline: "border border-wood text-wood",
+    default: "bg-brand-navy text-white",
+    outline: "border border-brand-navy text-brand-navy",
     success: "bg-suit-green text-white",
-    danger: "bg-accent-red text-white",
-    gold: "bg-highlight-gold text-ink"
+    danger: "bg-brand-oxblood text-white",
+    gold: "bg-suit-yellow text-brand-charcoal"
   };
   return (
     <div

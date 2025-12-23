@@ -9,52 +9,52 @@ import {
 
 // --- RULES MODAL (Ported from old_frontend.jsx) ---
 const RulesModal = ({ onClose }) => (
-  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/80 backdrop-blur-sm font-serif">
-    <div className="bg-parchment border-4 border-wood w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-xl shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col">
-      <div className="sticky top-0 bg-wood p-6 border-b-4 border-highlight-gold flex justify-between items-center z-10">
-        <h2 className="text-2xl font-bold text-highlight-gold flex items-center gap-3">
-          <Scroll size={24} /> Captain's Log
+  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-navy/80 backdrop-blur-sm">
+    <div className="bg-brand-parchment border border-brand-slate/20 w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col">
+      <div className="sticky top-0 bg-brand-navy p-6 border-b border-brand-teal/20 flex justify-between items-center z-10">
+        <h2 className="text-2xl font-bold text-white flex items-center gap-3 font-serif">
+          <Scroll size={24} className="text-brand-teal" /> Captain's Log
         </h2>
-        <button onClick={onClose} className="text-parchment hover:text-white p-2 hover:bg-highlight-gold/20 rounded-lg transition-colors">
+        <button onClick={onClose} className="text-white/60 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors">
           <X size={24} />
         </button>
       </div>
-      <div className="p-8 grid md:grid-cols-2 gap-8 text-ink">
+      <div className="p-8 grid md:grid-cols-2 gap-8 text-brand-charcoal">
         <section>
-          <h3 className="text-accent-red font-bold text-xl mb-4 flex items-center gap-2 border-b-2 border-ink/10 pb-2"><Crown size={18} /> Card Hierarchy</h3>
-          <div className="bg-wood/5 p-4 rounded-xl border border-ink/10 space-y-3">
+          <h3 className="text-brand-oxblood font-bold text-xl mb-4 flex items-center gap-2 border-b border-brand-charcoal/10 pb-2 font-serif"><Crown size={18} /> Card Hierarchy</h3>
+          <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-charcoal/5 space-y-3">
             <div className="flex items-center gap-3">
               <div className="flex -space-x-1">
-                <div className="w-4 h-4 rounded-full bg-suit-green border border-ink/20"></div>
-                <div className="w-4 h-4 rounded-full bg-suit-yellow border border-ink/20"></div>
-                <div className="w-4 h-4 rounded-full bg-suit-purple border border-ink/20"></div>
+                <div className="w-4 h-4 rounded-full bg-suit-green border border-white"></div>
+                <div className="w-4 h-4 rounded-full bg-suit-yellow border border-white"></div>
+                <div className="w-4 h-4 rounded-full bg-suit-purple border border-white"></div>
               </div>
               <span className="flex-1"><strong>Suits (1-14):</strong> Green, Yellow, Purple</span>
             </div>
-            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-suit-black border border-parchment/50"></div><span className="flex-1"><strong>Trump:</strong> Jolly Roger (Black) beats colors</span></div>
-            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-cyan-400 border border-ink/20"></div><span className="flex-1"><strong>Mermaid:</strong> Beats numbers & Skull King</span></div>
-            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-accent-red border border-ink/20"></div><span className="flex-1"><strong>Pirate:</strong> Beats numbers & Mermaid</span></div>
-            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-highlight-gold border border-ink/20"></div><span className="flex-1"><strong>Skull King:</strong> Beats all except Mermaid</span></div>
-            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-white border border-ink/20"></div><span className="flex-1"><strong>Escape:</strong> White Flag (Value 0)</span></div>
+            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-suit-black border border-white"></div><span className="flex-1"><strong>Trump:</strong> Jolly Roger (Black) beats colors</span></div>
+            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-cyan-500 border border-white"></div><span className="flex-1"><strong>Mermaid:</strong> Beats numbers & Skull King</span></div>
+            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-brand-oxblood border border-white"></div><span className="flex-1"><strong>Pirate:</strong> Beats numbers & Mermaid</span></div>
+            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-suit-yellow border border-white"></div><span className="flex-1"><strong>Skull King:</strong> Beats all except Mermaid</span></div>
+            <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-white border border-brand-charcoal/20"></div><span className="flex-1"><strong>Escape:</strong> White Flag (Value 0)</span></div>
           </div>
         </section>
 
         <section>
-          <h3 className="text-accent-red font-bold text-xl mb-4 flex items-center gap-2 border-b-2 border-ink/10 pb-2"><Trophy size={18} /> Scoring</h3>
-          <div className="bg-wood/5 p-4 rounded-xl border border-ink/10 space-y-4">
+          <h3 className="text-brand-oxblood font-bold text-xl mb-4 flex items-center gap-2 border-b border-brand-charcoal/10 pb-2 font-serif"><Trophy size={18} /> Scoring</h3>
+          <div className="bg-brand-navy/5 p-4 rounded-xl border border-brand-charcoal/5 space-y-4">
             <div>
-              <strong className="text-ink text-lg block mb-1">Standard Bid (> 0)</strong>
+              <strong className="text-brand-charcoal text-lg block mb-1">Standard Bid ({'>'} 0)</strong>
               <p className="text-sm">Exact: <span className="text-suit-green font-mono font-bold">+20</span> / trick</p>
-              <p className="text-sm">Miss: <span className="text-accent-red font-mono font-bold">-10</span> / diff</p>
+              <p className="text-sm">Miss: <span className="text-brand-oxblood font-mono font-bold">-10</span> / diff</p>
             </div>
-            <div className="border-t border-ink/10 pt-3">
-              <strong className="text-ink text-lg block mb-1">The Zero Bid</strong>
+            <div className="border-t border-brand-charcoal/10 pt-3">
+              <strong className="text-brand-charcoal text-lg block mb-1">The Zero Bid</strong>
               <p className="text-sm">Exact: <span className="text-suit-green font-mono font-bold">+10</span> × Round No.</p>
-              <p className="text-sm">Miss: <span className="text-accent-red font-mono font-bold">-10</span> × Round No.</p>
+              <p className="text-sm">Miss: <span className="text-brand-oxblood font-mono font-bold">-10</span> × Round No.</p>
             </div>
-            <div className="border-t border-ink/10 pt-3">
-              <strong className="text-ink text-lg block mb-1">Bonuses</strong>
-              <div className="grid grid-cols-2 gap-2 text-xs text-ink/70">
+            <div className="border-t border-brand-charcoal/10 pt-3">
+              <strong className="text-brand-charcoal text-lg block mb-1 font-serif">Bonuses</strong>
+              <div className="grid grid-cols-2 gap-2 text-xs text-brand-slate">
                 <span>Colored 14: +10</span>
                 <span>Black 14: +20</span>
                 <span>Pirate captures Mermaid: +20</span>
@@ -85,22 +85,22 @@ export default function App() {
   const handleNewVoyage = () => setView('SETUP');
 
   return (
-    <div className="min-h-screen bg-wood text-parchment font-serif pb-12">
+    <div className="min-h-screen bg-brand-parchment text-brand-charcoal pb-12 font-sans">
       {showRules && <RulesModal onClose={() => setShowRules(false)} />}
       
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-wood border-b-4 border-highlight-gold shadow-xl">
+      <header className="sticky top-0 z-30 bg-brand-navy text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4 cursor-pointer" onClick={() => setView('LOBBY')}>
-            <div className="w-12 h-12 bg-highlight-gold rounded-xl flex items-center justify-center shadow-lg border-2 border-ink/20 rotate-3 transform hover:rotate-0 transition-transform">
-              <Skull className="text-ink" size={28} strokeWidth={2.5} />
+            <div className="w-12 h-12 bg-brand-oxblood rounded-xl flex items-center justify-center shadow-lg border border-white/10 transform hover:scale-105 transition-transform">
+              <Skull className="text-white" size={28} strokeWidth={2.5} />
             </div>
             <div>
-              <h1 className="font-bold text-2xl tracking-widest text-highlight-gold drop-shadow-md">SKULL KING</h1>
-              <p className="text-parchment/60 text-xs font-sans tracking-widest uppercase">Companion App</p>
+              <h1 className="font-bold text-2xl tracking-tight text-white font-serif">SKULL KING</h1>
+              <p className="text-brand-teal text-xs font-sans tracking-widest uppercase font-bold">Companion</p>
             </div>
           </div>
-          <Button variant="ghost" onClick={() => setShowRules(true)}>
+          <Button variant="ghost" onClick={() => setShowRules(true)} className="text-white hover:text-brand-teal">
              <HelpCircle size={24} />
           </Button>
         </div>
@@ -126,37 +126,37 @@ function Lobby({ onNewVoyage, setGame }) {
 
   return (
     <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12 text-center">
-      <Card className="p-8 border-highlight-gold/50 border-4 bg-parchment">
-        <div className="bg-wood w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border-2 border-highlight-gold">
-          <Anchor size={40} className="text-highlight-gold" />
+      <Card className="p-8">
+        <div className="bg-brand-navy w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/10">
+          <Anchor size={40} className="text-brand-teal" />
         </div>
-        <h2 className="text-4xl font-bold text-ink mb-2 font-serif">Welcome Aboard</h2>
-        <p className="text-ink/60 font-sans mb-8">Ready to set sail on a new adventure?</p>
+        <h2 className="text-4xl font-bold text-brand-navy mb-2 font-serif">Welcome Aboard</h2>
+        <p className="text-brand-slate font-sans mb-8">Ready to set sail on a new adventure?</p>
         
-        <Button onClick={onNewVoyage} className="w-full py-5 text-xl font-bold shadow-lg">
+        <Button onClick={onNewVoyage} className="w-full py-5 text-xl font-bold">
           Start New Voyage
         </Button>
       </Card>
 
       {history.length > 0 && (
         <div className="mt-12 text-left">
-          <h3 className="text-highlight-gold font-bold text-xl mb-4 flex items-center gap-2">
-            <Trophy size={20} /> Captain's Log
+          <h3 className="text-brand-navy font-bold text-xl mb-4 flex items-center gap-2 font-serif">
+            <Trophy size={20} className="text-brand-teal" /> Captain's Log
           </h3>
           <div className="space-y-3">
             {history.map((g) => (
               <div 
                 key={g.id} 
                 onClick={() => setGame(g)}
-                className="bg-parchment/10 hover:bg-parchment/20 border border-parchment/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group"
+                className="bg-white hover:bg-brand-navy/5 border border-brand-slate/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
               >
                 <div>
-                  <p className="font-bold text-parchment group-hover:text-highlight-gold transition-colors">
+                  <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
                     {new Date(g.created_at).toLocaleDateString()}
                   </p>
-                  <p className="text-sm text-parchment/60">{g.status}</p>
+                  <p className="text-sm text-brand-slate">{g.status}</p>
                 </div>
-                <ChevronRight className="text-parchment/40 group-hover:text-highlight-gold" />
+                <ChevronRight className="text-brand-slate/40 group-hover:text-brand-teal" />
               </div>
             ))}
           </div>
@@ -190,15 +190,15 @@ function Setup({ onBack, onStart }) {
 
   return (
     <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12">
-      <Card className="p-8 text-center border-highlight-gold/50 border-4 bg-parchment">
+      <Card className="p-8 text-center">
         <div className="flex justify-start mb-4">
-           <Button variant="ghost" onClick={onBack} className="text-ink/50 hover:text-ink -ml-4"><ChevronRight className="rotate-180" /> Back</Button>
+           <Button variant="ghost" onClick={onBack} className="text-brand-slate hover:text-brand-navy -ml-4"><ChevronRight className="rotate-180" /> Back</Button>
         </div>
-        <div className="bg-wood w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border-2 border-highlight-gold">
-          <Users size={40} className="text-highlight-gold" />
+        <div className="bg-brand-navy w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/10">
+          <Users size={40} className="text-brand-teal" />
         </div>
-        <h2 className="text-4xl font-bold text-ink mb-2 font-serif">Assemble The Crew</h2>
-        <p className="text-ink/60 font-sans">Enter the names of all pirates daring to join this voyage.</p>
+        <h2 className="text-4xl font-bold text-brand-navy mb-2 font-serif">Assemble The Crew</h2>
+        <p className="text-brand-slate font-sans">Enter the names of all pirates daring to join this voyage.</p>
       </Card>
 
       <div className="flex gap-3 mb-6 mt-8">
@@ -210,19 +210,19 @@ function Setup({ onBack, onStart }) {
           placeholder="Enter pirate name..."
           autoFocus
         />
-        <Button onClick={addPlayer} className="w-20 shadow-lg text-3xl pb-4">+</Button>
+        <Button onClick={addPlayer} className="w-14 h-14 shrink-0 rounded-xl text-3xl font-light">+</Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
         {players.filter(p => p).map((name, i) => (
-          <div key={i} className="flex items-center justify-between p-4 bg-parchment rounded-xl border-2 border-ink/10 group hover:border-highlight-gold transition-colors shadow-md">
+          <div key={i} className="flex items-center justify-between p-4 bg-white rounded-xl border border-brand-slate/10 group hover:border-brand-teal/50 transition-colors shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-wood flex items-center justify-center text-highlight-gold font-bold text-lg shadow-inner border border-highlight-gold/50">
+              <div className="w-10 h-10 rounded-lg bg-brand-navy flex items-center justify-center text-brand-teal font-bold text-lg shadow-inner">
                 {name.charAt(0).toUpperCase()}
               </div>
-              <span className="font-bold text-xl text-ink">{name}</span>
+              <span className="font-bold text-xl text-brand-charcoal">{name}</span>
             </div>
-            <button onClick={() => removePlayer(name)} className="text-ink/40 hover:text-accent-red p-2 rounded-lg transition-colors">
+            <button onClick={() => removePlayer(name)} className="text-brand-slate/40 hover:text-brand-oxblood p-2 rounded-lg transition-colors">
               <X size={24} />
             </button>
           </div>
@@ -232,7 +232,7 @@ function Setup({ onBack, onStart }) {
       <Button
         onClick={start}
         disabled={players.filter(p => p).length < 2}
-        className="w-full text-xl py-5 shadow-xl border-2 border-ink/20"
+        className="w-full text-xl py-5 shadow-xl"
       >
         Set Sail <Anchor size={24} />
       </Button>
@@ -321,16 +321,15 @@ function GameLoop({ game, onExit, setGame }) {
      return (
         <div className="text-center space-y-8 animate-in zoom-in duration-500 pt-12">
             <div className="relative inline-block group">
-                <div className="absolute inset-0 bg-highlight-gold blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
-                <Trophy size={120} className="text-highlight-gold relative z-10 mx-auto drop-shadow-2xl" />
+                <div className="absolute inset-0 bg-brand-teal blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
+                <Trophy size={120} className="text-suit-yellow relative z-10 mx-auto drop-shadow-2xl" />
             </div>
 
             <div>
-                <h2 className="text-4xl md:text-6xl font-bold text-parchment mb-6 tracking-tight drop-shadow-md">Captain of the Seas</h2>
-                <div className="text-4xl md:text-5xl text-ink font-bold bg-parchment inline-block px-12 py-6 rounded-2xl border-4 border-highlight-gold shadow-2xl transform hover:scale-105 transition-transform">
+                <h2 className="text-4xl md:text-6xl font-bold text-brand-navy mb-6 tracking-tight drop-shadow-md font-serif">Captain of the Seas</h2>
+                <div className="text-4xl md:text-5xl text-white font-bold bg-brand-navy inline-block px-12 py-6 rounded-3xl border border-brand-teal/20 shadow-2xl transform hover:scale-105 transition-transform">
                     {leader?.name}
                 </div>
-                {/* Score calculation would go here if not available on player object directly */}
                 <div className="mt-8 flex justify-center gap-4">
                      <Button onClick={onExit} variant="secondary">Return to Port</Button>
                 </div>
@@ -350,11 +349,11 @@ function GameLoop({ game, onExit, setGame }) {
             {/* Header for Round */}
             <div className="flex items-center justify-between mb-2">
                 <div>
-                   <h2 className="text-3xl font-bold text-highlight-gold flex items-center gap-3 drop-shadow-sm">
-                       {localPhase === 'BID' ? <Swords className="text-parchment" size={32} /> : <Crown className="text-parchment" size={32} />}
+                   <h2 className="text-3xl font-bold text-brand-navy flex items-center gap-3 font-serif">
+                       {localPhase === 'BID' ? <Swords className="text-brand-oxblood" size={32} /> : <Crown className="text-suit-yellow" size={32} />}
                        {localPhase === 'BID' ? 'Bidding Phase' : 'Resolution Phase'}
                    </h2>
-                   <p className="text-parchment/60 text-sm font-sans tracking-widest mt-1">ROUND {currentRound.round_number} • {currentRound.card_count} CARDS</p>
+                   <p className="text-brand-slate text-sm font-sans tracking-widest mt-1 font-bold uppercase">ROUND {currentRound.round_number} • {currentRound.card_count} CARDS</p>
                 </div>
                  <div className="flex gap-2">
                      <Button variant="danger" onClick={undoLast} className="px-3"><RotateCcw size={16}/></Button>
@@ -368,24 +367,24 @@ function GameLoop({ game, onExit, setGame }) {
                         {game.players.map(player => {
                             const currentBid = bids[player.id] ?? 0;
                             return (
-                                <Card key={player.id} className="p-6 flex flex-col gap-4 relative overflow-hidden group">
-                                    <div className="absolute top-0 left-0 right-0 h-1 bg-highlight-gold opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <div className="font-bold text-xl text-ink border-b-2 border-ink/10 pb-2 flex justify-between items-center">
+                                <Card key={player.id} className="p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-brand-teal/30">
+                                    <div className="absolute top-0 left-0 right-0 h-1 bg-brand-teal opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <div className="font-bold text-xl text-brand-navy border-b border-brand-charcoal/5 pb-2 flex justify-between items-center font-serif">
                                         {player.name}
                                     </div>
-                                    <div className="flex items-center justify-between gap-4 bg-wood/5 p-3 rounded-xl border border-ink/10">
+                                    <div className="flex items-center justify-between gap-4 bg-brand-navy/5 p-3 rounded-xl border border-brand-charcoal/5">
                                         <button
                                             onClick={() => setBids({ ...bids, [player.id]: Math.max(0, currentBid - 1) })}
-                                            className="w-12 h-12 rounded-lg bg-wood hover:bg-ink flex items-center justify-center text-parchment active:scale-95 transition-all shadow-md border-b-4 border-black/20"
+                                            className="w-12 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white active:scale-95 transition-all shadow-md"
                                         >
                                             <Minus size={24} />
                                         </button>
-                                        <span className={`flex-1 text-center text-4xl font-bold font-mono ${currentBid === 0 ? 'text-highlight-gold' : 'text-ink'}`}>
+                                        <span className={`flex-1 text-center text-4xl font-bold font-mono ${currentBid === 0 ? 'text-brand-teal' : 'text-brand-navy'}`}>
                                             {currentBid}
                                         </span>
                                         <button
                                             onClick={() => setBids({ ...bids, [player.id]: Math.min(currentRound.round_number, currentBid + 1) })}
-                                            className="w-12 h-12 rounded-lg bg-wood hover:bg-ink flex items-center justify-center text-parchment active:scale-95 transition-all shadow-md border-b-4 border-black/20"
+                                            className="w-12 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white active:scale-95 transition-all shadow-md"
                                         >
                                             <Plus size={24} />
                                         </button>
@@ -395,7 +394,7 @@ function GameLoop({ game, onExit, setGame }) {
                         })}
                     </div>
                     {/* Action Bar */}
-                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-wood/95 backdrop-blur-md border-t-4 border-highlight-gold lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20">
+                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-brand-slate/10 lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20">
                         <div className="max-w-7xl mx-auto lg:flex lg:justify-end">
                             <Button onClick={() => setLocalPhase('RESOLUTION')} className="w-full lg:w-auto lg:px-12 text-xl shadow-xl">
                                 Confirm Bids <Swords size={24} />
@@ -417,12 +416,12 @@ function GameLoop({ game, onExit, setGame }) {
                             const canAddTrick = totalTricksEntered < currentRound.round_number;
 
                             return (
-                                <Card key={player.id} className="p-6 space-y-4 hover:border-highlight-gold transition-colors border-2">
-                                    <div className="flex justify-between items-center border-b-2 border-ink/10 pb-3">
-                                        <span className="font-bold text-2xl text-ink">{player.name}</span>
+                                <Card key={player.id} className="p-6 space-y-4 hover:border-brand-teal/30 transition-colors">
+                                    <div className="flex justify-between items-center border-b border-brand-charcoal/5 pb-3">
+                                        <span className="font-bold text-2xl text-brand-navy font-serif">{player.name}</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="text-xs text-ink/60 uppercase font-bold tracking-wider">Bid</span>
-                                            <span className={`text-xl font-mono font-bold px-4 py-1 rounded-lg bg-wood border-2 border-ink/20 ${bid === 0 ? 'text-highlight-gold' : 'text-parchment'}`}>
+                                            <span className="text-xs text-brand-slate uppercase font-bold tracking-wider">Bid</span>
+                                            <span className={`text-xl font-mono font-bold px-4 py-1 rounded-lg bg-brand-navy border border-brand-teal/20 ${bid === 0 ? 'text-brand-teal' : 'text-white'}`}>
                                                 {bid}
                                             </span>
                                         </div>
@@ -430,21 +429,21 @@ function GameLoop({ game, onExit, setGame }) {
 
                                     <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-6">
                                         <div className="flex flex-col justify-center">
-                                            <label className="text-xs text-ink/60 uppercase font-bold mb-2 tracking-wider">Tricks Won</label>
-                                            <div className="flex items-center gap-3 bg-wood/5 p-2 rounded-xl border border-ink/10">
+                                            <label className="text-xs text-brand-slate uppercase font-bold mb-2 tracking-wider">Tricks Won</label>
+                                            <div className="flex items-center gap-3 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5">
                                                 <button
                                                     onClick={() => setTricks({ ...tricks, [player.id]: Math.max(0, playerTricks - 1) })}
-                                                    className="w-12 h-12 rounded-lg bg-wood hover:bg-ink flex items-center justify-center text-parchment transition-all shadow-md border-b-4 border-black/20"
+                                                    className="w-12 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white transition-all shadow-md"
                                                 >
                                                     <Minus size={20} />
                                                 </button>
-                                                <span className={`flex-1 text-center font-bold text-4xl font-mono ${playerTricks === bid ? 'text-suit-green' : 'text-ink'}`}>
+                                                <span className={`flex-1 text-center font-bold text-4xl font-mono ${playerTricks === bid ? 'text-suit-green' : 'text-brand-navy'}`}>
                                                     {playerTricks}
                                                 </span>
                                                 <button
                                                     onClick={() => setTricks({ ...tricks, [player.id]: Math.min(currentRound.round_number, playerTricks + 1) })}
                                                     disabled={!canAddTrick}
-                                                    className="w-12 h-12 rounded-lg bg-wood hover:bg-ink flex items-center justify-center text-parchment disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-md border-b-4 border-black/20"
+                                                    className="w-12 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-md"
                                                 >
                                                     <Plus size={20} />
                                                 </button>
@@ -452,20 +451,20 @@ function GameLoop({ game, onExit, setGame }) {
                                         </div>
 
                                         <div className="flex flex-col justify-center">
-                                            <label className="text-xs text-ink/60 uppercase font-bold mb-2 tracking-wider">Bonus Pts</label>
-                                            <div className="flex items-center gap-2 bg-wood/5 p-2 rounded-xl border border-ink/10 h-[66px]">
+                                            <label className="text-xs text-brand-slate uppercase font-bold mb-2 tracking-wider">Bonus Pts</label>
+                                            <div className="flex items-center gap-2 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5 h-[66px]">
                                                 <button
                                                     onClick={() => setBonuses({ ...bonuses, [player.id]: Math.max(0, bonus - 10) })}
-                                                    className="w-10 h-12 rounded-lg bg-wood hover:bg-ink flex items-center justify-center text-parchment transition-colors active:scale-95 shadow-sm"
+                                                    className="w-10 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white transition-colors active:scale-95 shadow-sm"
                                                 >
                                                     <Minus size={16} />
                                                 </button>
-                                                <span className="flex-1 text-center font-bold text-xl font-mono text-highlight-gold">
+                                                <span className="flex-1 text-center font-bold text-xl font-mono text-brand-teal">
                                                     {bonus}
                                                 </span>
                                                 <button
                                                     onClick={() => setBonuses({ ...bonuses, [player.id]: bonus + 10 })}
-                                                    className="w-10 h-12 rounded-lg bg-wood hover:bg-ink flex items-center justify-center text-parchment transition-colors active:scale-95 shadow-sm"
+                                                    className="w-10 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white transition-colors active:scale-95 shadow-sm"
                                                 >
                                                     <Plus size={16} />
                                                 </button>
@@ -478,14 +477,14 @@ function GameLoop({ game, onExit, setGame }) {
                     </div>
 
                      {/* Validation / Submit */}
-                     <div className="fixed bottom-0 left-0 right-0 p-4 bg-wood/95 backdrop-blur-md border-t-4 border-highlight-gold lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20 flex flex-col items-end gap-4">
-                        <div className="flex items-center gap-3 text-parchment bg-wood/50 p-2 rounded-lg border border-parchment/10">
+                     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-brand-slate/10 lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20 flex flex-col items-end gap-4">
+                        <div className="flex items-center gap-3 text-brand-charcoal bg-brand-navy/5 p-2 rounded-lg border border-brand-charcoal/10">
                              <input 
                                type="checkbox" 
                                id="kraken" 
                                checked={kraken} 
                                onChange={e => setKraken(e.target.checked)}
-                               className="w-5 h-5 rounded border-parchment text-highlight-gold focus:ring-highlight-gold bg-wood" 
+                               className="w-5 h-5 rounded border-brand-slate text-brand-teal focus:ring-brand-teal bg-white" 
                              />
                              <label htmlFor="kraken" className="text-sm font-bold">Kraken/Whale Played (Bypass Check)</label>
                         </div>
@@ -510,23 +509,23 @@ function GameLoop({ game, onExit, setGame }) {
         {/* SIDEBAR */}
         <aside className="hidden lg:block lg:sticky lg:top-28 space-y-6">
             <Card className="p-6">
-                 <h3 className="text-ink/60 text-sm uppercase tracking-wider font-bold mb-4">Current Voyage</h3>
+                 <h3 className="text-brand-slate text-sm uppercase tracking-wider font-bold mb-4">Current Voyage</h3>
                  <div className="flex items-baseline gap-2 mb-2">
-                    <span className="text-5xl font-bold text-highlight-gold drop-shadow-sm">{currentRound.round_number}</span>
-                    <span className="text-ink/40 text-xl font-bold">/ 10</span>
+                    <span className="text-5xl font-bold text-brand-navy font-serif">{currentRound.round_number}</span>
+                    <span className="text-brand-slate text-xl font-bold">/ 10</span>
                  </div>
                  
                  {localPhase === 'RESOLUTION' && (
-                     <div className="bg-wood/5 rounded-lg p-4 border border-ink/10 mt-4">
-                        <div className="flex justify-between text-sm mb-2 text-ink/70 font-medium">
+                     <div className="bg-brand-navy/5 rounded-lg p-4 border border-brand-charcoal/5 mt-4">
+                        <div className="flex justify-between text-sm mb-2 text-brand-slate font-medium">
                             <span>Tricks Accounted For</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className={`text-2xl font-bold ${Object.values(tricks).reduce((a,b)=>a+b,0) === currentRound.round_number ? 'text-suit-green' : 'text-ink'}`}>
+                            <span className={`text-2xl font-bold ${Object.values(tricks).reduce((a,b)=>a+b,0) === currentRound.round_number ? 'text-suit-green' : 'text-brand-navy'}`}>
                                 {Object.values(tricks).reduce((a,b)=>a+b,0)}
-                                <span className="text-ink/40 text-lg"> / {currentRound.round_number}</span>
+                                <span className="text-brand-slate text-lg"> / {currentRound.round_number}</span>
                             </span>
-                             {Object.values(tricks).reduce((a,b)=>a+b,0) === currentRound.round_number && <Crown size={20} className="text-highlight-gold" />}
+                             {Object.values(tricks).reduce((a,b)=>a+b,0) === currentRound.round_number && <Crown size={20} className="text-suit-yellow" />}
                         </div>
                      </div>
                  )}
@@ -550,19 +549,19 @@ function Leaderboard({ game, compact = false }) {
 
   return (
     <Card className="flex-1 overflow-hidden flex flex-col">
-        <div className="p-4 border-b border-ink/10 bg-wood/5">
-            <h3 className="text-accent-red font-bold flex items-center gap-2">
-                <Trophy size={16} /> Leaderboard
+        <div className="p-4 border-b border-brand-charcoal/5 bg-brand-navy/5">
+            <h3 className="text-brand-oxblood font-bold flex items-center gap-2 font-serif">
+                <Trophy size={16} className="text-brand-teal" /> Leaderboard
             </h3>
         </div>
         <div className="p-2 overflow-y-auto max-h-[500px]">
             <table className="w-full text-sm">
-                <tbody className="divide-y divide-ink/10">
+                <tbody className="divide-y divide-brand-charcoal/5">
                     {standings.map((p, i) => (
-                        <tr key={p.id} className="hover:bg-wood/5 transition-colors">
-                            <td className="py-3 px-3 w-8 font-mono text-ink/50 font-bold">{i + 1}</td>
-                            <td className="py-3 px-3 font-bold text-ink">{p.name}</td>
-                            <td className="py-3 px-3 text-right font-bold text-highlight-gold font-mono text-lg drop-shadow-sm">{p.total}</td>
+                        <tr key={p.id} className="hover:bg-brand-navy/5 transition-colors">
+                            <td className="py-3 px-3 w-8 font-mono text-brand-slate font-bold">{i + 1}</td>
+                            <td className="py-3 px-3 font-bold text-brand-navy font-serif">{p.name}</td>
+                            <td className="py-3 px-3 text-right font-bold text-brand-teal font-mono text-lg">{p.total}</td>
                         </tr>
                     ))}
                 </tbody>

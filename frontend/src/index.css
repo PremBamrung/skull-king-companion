@@ -1,47 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --bg-wood: #4A3B2A;
-  --bg-parchment: #E6DBC4;
-  --text-ink: #2B221B;
-  --accent-red: #A83226;
-  --highlight-gold: #D4AF37;
-  --suit-green: #4E7A40;
-  --suit-purple: #5D4078;
-  --suit-yellow: #D9A42C;
-  --suit-black: #1A1A1A;
+  --brand-parchment: #F8F5F0;
+  --brand-navy: #0F172A;
+  --brand-oxblood: #A63D33;
+  --brand-teal: #007A7C;
+  --brand-charcoal: #1E293B;
+  --brand-slate: #64748B;
+
+  --suit-green: #22C55E;
+  --suit-yellow: #EAB308;
+  --suit-purple: #A855F7;
+  --suit-black: #1E293B;
+
+  /* Backward compatibility variables */
+  --bg-wood: var(--brand-navy);
+  --bg-parchment: var(--brand-parchment);
+  --text-ink: var(--brand-charcoal);
+  --accent-red: var(--brand-oxblood);
+  --highlight-gold: var(--suit-yellow);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--bg-wood);
-  color: var(--text-ink);
-  font-family: serif; /* Giving it that pirate feel */
-}
-
-/* Background Texture Overlay */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image: url('https://www.transparenttextures.com/patterns/wood-pattern.png');
-  opacity: 0.1;
-  pointer-events: none;
-  z-index: 0;
-  mix-blend-mode: overlay;
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(0,0,0,0) 0%, rgba(0,0,0,0.4) 100%);
-  pointer-events: none;
-  z-index: 0;
+  background-color: var(--brand-parchment);
+  color: var(--brand-charcoal);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {

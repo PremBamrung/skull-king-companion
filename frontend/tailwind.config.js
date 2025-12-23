@@ -8,24 +8,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        wood: 'var(--bg-wood)',
-        parchment: 'var(--bg-parchment)',
-        ink: 'var(--text-ink)',
-        accent: {
-          red: 'var(--accent-red)',
-        },
-        highlight: {
-          gold: 'var(--highlight-gold)',
+        brand: {
+          parchment: '#F8F5F0',
+          navy: '#0F172A',
+          oxblood: '#A63D33',
+          teal: '#007A7C',
+          charcoal: '#1E293B',
+          slate: '#64748B',
         },
         suit: {
-          green: 'var(--suit-green)',
-          purple: 'var(--suit-purple)',
-          yellow: 'var(--suit-yellow)',
-          black: 'var(--suit-black)',
+          green: '#22C55E',
+          yellow: '#EAB308',
+          purple: '#A855F7',
+          black: '#1E293B',
+        },
+        // Deprecated names for backward compatibility during transition
+        wood: '#0F172A', // Map to brand navy
+        parchment: '#F8F5F0', // Map to brand parchment
+        ink: '#1E293B', // Map to brand charcoal
+        accent: {
+          red: '#A63D33', // Map to oxblood
+        },
+        highlight: {
+          gold: '#EAB308', // Map to suit yellow
         }
       },
       fontFamily: {
-        serif: ['serif'], // Ensure serif defaults to browser serif or specify a font if needed
+        sans: ['Inter', 'sans-serif'],
+        serif: ['Playfair Display', 'serif'],
+      },
+      borderRadius: {
+        'skull': '12px',
       }
     },
   },
