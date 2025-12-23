@@ -17,7 +17,9 @@ export const translations = {
     enter_name_placeholder: "Enter pirate name...",
     need_at_least_2: "Need at least 2 pirates!",
     back: "Back",
+    back_to_lobby: "Back to Lobby",
     set_sail: "Set Sail",
+    no_pirates_yet: "No pirates joined yet...",
     
     // Game Loop
     loading_voyage: "Loading voyage details...",
@@ -105,7 +107,9 @@ export const translations = {
     enter_name_placeholder: "Nom du pirate...",
     need_at_least_2: "Il faut au moins 2 pirates !",
     back: "Retour",
+    back_to_lobby: "Retour au Lobby",
     set_sail: "Mettre les Voiles",
+    no_pirates_yet: "Aucun pirate pour le moment...",
     
     // Game Loop
     loading_voyage: "Chargement du voyage...",

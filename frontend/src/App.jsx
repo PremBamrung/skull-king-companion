@@ -198,7 +198,7 @@ export default function App() {
 
       {/* Header */}
       <header className="sticky top-0 z-30 bg-brand-navy text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
+        <div className="max-w-[1600px] mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4 cursor-pointer" onClick={() => setView('LOBBY')}>
             <div className="w-12 h-12 bg-brand-oxblood rounded-xl flex items-center justify-center shadow-lg border border-white/10 transform hover:scale-105 transition-transform">
               <Skull className="text-white" size={28} strokeWidth={2.5} />
@@ -238,7 +238,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-4 md:p-6 relative z-10">
+      <div className="max-w-[1600px] mx-auto p-4 md:p-6 relative z-10">
         {view === 'LOBBY' && <Lobby onNewVoyage={handleNewVoyage} onSelectGame={handleSelectGame} />}
         {view === 'SETUP' && <Setup onBack={() => setView('LOBBY')} onStart={(g) => { setGame(g); setView('PLAY'); }} />}
         {view === 'PLAY' && <GameLoop game={game} onExit={() => { clearGame(); setView('LOBBY'); }} setGame={setGame} />}
@@ -248,6 +248,44 @@ export default function App() {
 }
 
 // --- SUB-COMPONENTS ---
+
+const HistoryCard = ({ round, players, onEdit }) => {
+  const { language } = useGameStore();
+  const t = (key) => translations[language][key] || key;
+
+  return (
+    <Card className="p-4 bg-white/50 border-brand-charcoal/5 hover:border-brand-teal/30 transition-colors">
+      <div className="flex justify-between items-center mb-4 border-b border-brand-charcoal/5 pb-2">
+        <span className="font-bold text-brand-navy font-serif">{t('round')} {round.round_number}</span>
+        <Button variant="ghost" size="sm" onClick={onEdit} className="text-brand-slate hover:text-brand-teal h-8 w-8 p-0">
+          <Edit size={14} />
+        </Button>
+      </div>
+      <div className="space-y-2">
+        {round.player_stats.map(s => {
+          const player = players.find(p => p.id === s.player_id);
+          const success = s.bid === s.tricks_won;
+          return (
+            <div key={s.player_id} className="flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <div className={cn("w-2 h-2 rounded-full", success ? "bg-suit-green" : "bg-brand-oxblood")} />
+                <span className="font-bold text-brand-navy truncate max-w-[100px]">{player?.name}</span>
+              </div>
+              <div className="flex items-center gap-2 font-mono">
+                <div className="text-brand-slate">
+                  {s.tricks_won}/{s.bid}
+                </div>
+                <div className={cn("font-bold min-w-[35px] text-right", s.round_score >= 0 ? "text-suit-green" : "text-brand-oxblood")}>
+                  {s.round_score > 0 ? "+" : ""}{s.round_score}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
+  );
+};
 
 function Lobby({ onNewVoyage, onSelectGame }) {
   const { language } = useGameStore();
@@ -269,56 +307,62 @@ function Lobby({ onNewVoyage, onSelectGame }) {
   };
 
   return (
-    <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12 text-center">
-      <Card className="p-8">
-        <div className="bg-brand-navy w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/10">
-          <Anchor size={40} className="text-brand-teal" />
+    <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12">
+      <div className="grid lg:grid-cols-5 gap-12 items-start">
+        <div className="lg:col-span-2 text-center lg:text-left sticky lg:top-32">
+          <Card className="p-8">
+            <div className="bg-brand-navy w-20 h-20 rounded-2xl flex items-center justify-center mx-auto lg:mx-0 mb-6 shadow-xl border border-white/10">
+              <Anchor size={40} className="text-brand-teal" />
+            </div>
+            <h2 className="text-4xl font-bold text-brand-navy mb-2 font-serif">{t('welcome_aboard')}</h2>
+            <p className="text-brand-slate font-sans mb-8">{t('ready_to_set_sail')}</p>
+            
+            <Button onClick={onNewVoyage} className="w-full py-5 text-xl font-bold">
+              {t('start_new_voyage')}
+            </Button>
+          </Card>
         </div>
-        <h2 className="text-4xl font-bold text-brand-navy mb-2 font-serif">{t('welcome_aboard')}</h2>
-        <p className="text-brand-slate font-sans mb-8">{t('ready_to_set_sail')}</p>
-        
-        <Button onClick={onNewVoyage} className="w-full py-5 text-xl font-bold">
-          {t('start_new_voyage')}
-        </Button>
-      </Card>
 
-      {history.length > 0 && (
-        <div className="mt-12 text-left">
-          <h3 className="text-brand-navy font-bold text-xl mb-4 flex items-center gap-2 font-serif">
-            <Trophy size={20} className="text-brand-teal" /> {t('captains_log')}
-          </h3>
-          <div className="space-y-3">
-            {history.map((g) => (
-              <div
-                key={g.id}
-                onClick={() => onSelectGame(g)}
-                className="bg-white hover:bg-brand-navy/5 border border-brand-slate/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-lg bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-teal/10 group-hover:text-brand-teal transition-colors">
-                    <Anchor size={20} />
-                  </div>
-                  <div>
-                    <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
-                      {new Date(g.created_at).toLocaleDateString()}
-                    </p>
-                    <p className="text-xs text-brand-slate uppercase tracking-wider font-bold">{g.status}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => deleteGame(g.id, e)}
-                    className="p-2 text-brand-slate/40 hover:text-brand-oxblood hover:bg-brand-oxblood/5 rounded-lg transition-all"
+        <div className="lg:col-span-3">
+          {history.length > 0 && (
+            <div className="text-left">
+              <h3 className="text-brand-navy font-bold text-xl mb-4 flex items-center gap-2 font-serif">
+                <Trophy size={20} className="text-brand-teal" /> {t('captains_log')}
+              </h3>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-3">
+                {history.map((g) => (
+                  <div
+                    key={g.id}
+                    onClick={() => onSelectGame(g)}
+                    className="bg-white hover:bg-brand-navy/5 border border-brand-slate/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
                   >
-                    <Trash2 size={18} />
-                  </button>
-                  <ChevronRight className="text-brand-slate/40 group-hover:text-brand-teal" />
-                </div>
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-lg bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-teal/10 group-hover:text-brand-teal transition-colors">
+                        <Anchor size={20} />
+                      </div>
+                      <div>
+                        <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
+                          {new Date(g.created_at).toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-brand-slate uppercase tracking-wider font-bold">{g.status}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={(e) => deleteGame(g.id, e)}
+                        className="p-2 text-brand-slate/40 hover:text-brand-oxblood hover:bg-brand-oxblood/5 rounded-lg transition-all"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                      <ChevronRight className="text-brand-slate/40 group-hover:text-brand-teal" />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -348,53 +392,82 @@ function Setup({ onBack, onStart }) {
   };
 
   return (
-    <div className="max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12">
-      <Card className="p-8 text-center">
-        <div className="flex justify-start mb-4">
-           <Button variant="ghost" onClick={onBack} className="text-brand-slate hover:text-brand-navy -ml-4"><ChevronRight className="rotate-180" /> {t('back')}</Button>
-        </div>
-        <div className="bg-brand-navy w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-xl border border-white/10">
-          <Users size={40} className="text-brand-teal" />
-        </div>
-        <h2 className="text-4xl font-bold text-brand-navy mb-2 font-serif">{t('assemble_crew')}</h2>
-        <p className="text-brand-slate font-sans">{t('enter_pirate_names')}</p>
-      </Card>
-
-      <div className="flex gap-3 mb-6 mt-8">
-        <Input
-          type="text"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
-          placeholder={t('enter_name_placeholder')}
-          autoFocus
-        />
-        <Button onClick={addPlayer} className="w-14 h-14 shrink-0 rounded-xl text-3xl font-light">+</Button>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
-        {players.filter(p => p).map((name, i) => (
-          <div key={i} className="flex items-center justify-between p-4 bg-white rounded-xl border border-brand-slate/10 group hover:border-brand-teal/50 transition-colors shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-brand-navy flex items-center justify-center text-brand-teal font-bold text-lg shadow-inner">
-                {name.charAt(0).toUpperCase()}
-              </div>
-              <span className="font-bold text-xl text-brand-charcoal">{name}</span>
+    <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12">
+      <div className="grid lg:grid-cols-5 gap-12 items-start">
+        <div className="lg:col-span-2 text-center lg:text-left sticky lg:top-32">
+          <Card className="p-8">
+            <div className="flex justify-start mb-4 lg:hidden">
+              <Button variant="ghost" onClick={onBack} className="text-brand-slate hover:text-brand-navy -ml-4">
+                <ChevronRight className="rotate-180" /> {t('back')}
+              </Button>
             </div>
-            <button onClick={() => removePlayer(name)} className="text-brand-slate/40 hover:text-brand-oxblood p-2 rounded-lg transition-colors">
-              <X size={24} />
-            </button>
-          </div>
-        ))}
-      </div>
+            <div className="hidden lg:flex justify-start mb-4">
+              <Button variant="ghost" onClick={onBack} className="text-brand-slate hover:text-brand-navy -ml-4">
+                <ChevronRight className="rotate-180" /> {t('back_to_lobby')}
+              </Button>
+            </div>
+            <div className="bg-brand-navy w-20 h-20 rounded-2xl flex items-center justify-center mx-auto lg:mx-0 mb-6 shadow-xl border border-white/10">
+              <Users size={40} className="text-brand-teal" />
+            </div>
+            <h2 className="text-4xl font-bold text-brand-navy mb-2 font-serif">{t('assemble_crew')}</h2>
+            <p className="text-brand-slate font-sans mb-8">{t('enter_pirate_names')}</p>
 
-      <Button
-        onClick={start}
-        disabled={players.filter(p => p).length < 2}
-        className="w-full text-xl py-5 shadow-xl"
-      >
-        {t('set_sail')} <Anchor size={24} />
-      </Button>
+            <div className="flex gap-3 mb-6">
+              <Input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
+                placeholder={t('enter_name_placeholder')}
+                autoFocus
+              />
+              <Button onClick={addPlayer} className="w-14 h-14 shrink-0 rounded-xl text-3xl font-light">
+                +
+              </Button>
+            </div>
+
+            <Button
+              onClick={start}
+              disabled={players.filter((p) => p).length < 2}
+              className="w-full text-xl py-5 shadow-xl"
+            >
+              {t('set_sail')} <Anchor size={24} className="ml-2" />
+            </Button>
+          </Card>
+        </div>
+
+        <div className="lg:col-span-3">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-1 gap-3">
+            {players
+              .filter((p) => p)
+              .map((name, i) => (
+                <div
+                  key={i}
+                  className="flex items-center justify-between p-4 bg-white rounded-xl border border-brand-slate/10 group hover:border-brand-teal/50 transition-colors shadow-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-brand-navy flex items-center justify-center text-brand-teal font-bold text-xl shadow-inner">
+                      {name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="font-bold text-2xl text-brand-charcoal font-serif">{name}</span>
+                  </div>
+                  <button
+                    onClick={() => removePlayer(name)}
+                    className="text-brand-slate/40 hover:text-brand-oxblood p-2 rounded-lg transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+              ))}
+          </div>
+
+          {players.filter((p) => p).length === 0 && (
+            <div className="text-center py-20 border-2 border-dashed border-brand-slate/20 rounded-2xl">
+              <p className="text-brand-slate font-bold uppercase tracking-widest">{t('no_pirates_yet')}</p>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -483,27 +556,60 @@ function GameLoop({ game, onExit, setGame }) {
     })[0];
 
     return (
-      <div className="max-w-6xl mx-auto space-y-12 animate-in zoom-in duration-500 pt-12">
-        <div className="text-center space-y-8">
-          <div className="relative inline-block group">
-            <div className="absolute inset-0 bg-brand-teal blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
-            <Trophy size={120} className="text-suit-yellow relative z-10 mx-auto drop-shadow-2xl" />
+      <div className="max-w-[1600px] mx-auto space-y-8 animate-in zoom-in duration-500 pt-12 pb-24">
+        <div className="grid lg:grid-cols-4 gap-8 items-start">
+          {/* Winner Section */}
+          <div className="lg:col-span-1 space-y-8 text-center sticky lg:top-32">
+            <div className="relative inline-block group">
+              <div className="absolute inset-0 bg-brand-teal blur-3xl opacity-20 rounded-full group-hover:opacity-40 transition-opacity"></div>
+              <Trophy size={120} className="text-suit-yellow relative z-10 mx-auto drop-shadow-2xl" />
+            </div>
+
+            <div>
+              <h2 className="text-4xl font-bold text-brand-navy mb-4 tracking-tight font-serif uppercase text-sm">
+                {t('captain_of_seas')}
+              </h2>
+              <div className="text-3xl font-bold bg-brand-navy text-white px-8 py-4 rounded-2xl border border-brand-teal/20 shadow-xl mb-6">
+                {leader?.name}
+              </div>
+              <Button onClick={onExit} variant="secondary" className="w-full py-4 text-lg">
+                {t('return_to_port')}
+              </Button>
+            </div>
           </div>
 
-          <div>
-            <h2 className="text-4xl md:text-6xl font-bold text-brand-navy mb-6 tracking-tight drop-shadow-md font-serif">{t('captain_of_seas')}</h2>
-            <div className="text-4xl md:text-5xl text-white font-bold bg-brand-navy inline-block px-12 py-6 rounded-3xl border border-brand-teal/20 shadow-2xl transform hover:scale-105 transition-transform">
-              {leader?.name}
+          {/* Right side: Graph and Leaderboard */}
+          <div className="lg:col-span-3 space-y-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2">
+                <ScoreGraph game={game} variant="hero" />
+              </div>
+              <div className="lg:col-span-1">
+                <Leaderboard game={game} compact onEditRound={startEditRound} />
+              </div>
             </div>
-            <div className="mt-8 flex justify-center gap-4">
-              <Button onClick={onExit} variant="secondary">{t('return_to_port')}</Button>
+            
+            {/* Full Width History Section */}
+            <div className="pt-8 border-t border-brand-charcoal/10">
+              <h3 className="text-2xl font-bold text-brand-navy mb-6 flex items-center gap-3 font-serif">
+                <RotateCcw size={28} className="text-brand-teal" /> {t('voyage_history')}
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+                {game.rounds
+                  .filter(r => r.player_stats?.length > 0)
+                  .sort((a,b) => a.round_number - b.round_number)
+                  .map(r => (
+                    <HistoryCard 
+                      key={r.id} 
+                      round={r} 
+                      players={game.players} 
+                      onEdit={() => startEditRound(r)} 
+                    />
+                  ))
+                }
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-8">
-          <ScoreGraph game={game} variant="hero" />
-          <Leaderboard game={game} onEditRound={startEditRound} />
         </div>
       </div>
     );
@@ -584,7 +690,7 @@ function GameLoop({ game, onExit, setGame }) {
                         })}
                     </div>
                     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-brand-slate/10 lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20">
-                        <div className="max-w-7xl mx-auto lg:flex lg:justify-end">
+                        <div className="max-w-[1600px] mx-auto lg:flex lg:justify-end">
                             <Button onClick={() => setLocalPhase('RESOLUTION')} className="w-full lg:w-auto lg:px-12 text-xl shadow-xl">
                                 {t('confirm_bids')} <Swords size={24} />
                             </Button>
