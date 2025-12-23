@@ -186,11 +186,34 @@ export default function App() {
   const [view, setView] = useState('LOBBY'); // LOBBY, SETUP, PLAY
   const [showRules, setShowRules] = useState(false);
 
-  const handleNewVoyage = () => setView('SETUP');
+  // Sync state with browser history
+  useEffect(() => {
+    // Initial state
+    window.history.replaceState({ view: 'LOBBY' }, '');
+
+    const handlePopState = (event) => {
+      if (event.state && event.state.view) {
+        setView(event.state.view);
+      } else {
+        setView('LOBBY');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (newView) => {
+    if (newView === view) return;
+    window.history.pushState({ view: newView }, '');
+    setView(newView);
+  };
+
+  const handleNewVoyage = () => navigateTo('SETUP');
   
   const handleSelectGame = (g) => {
     setGame(g);
-    setView('PLAY');
+    navigateTo('PLAY');
   };
 
   return (
@@ -200,7 +223,7 @@ export default function App() {
       {/* Header */}
       <header className="sticky top-0 z-30 bg-brand-navy text-white shadow-xl">
         <div className="max-w-[1600px] mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-4 cursor-pointer" onClick={() => setView('LOBBY')}>
+          <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigateTo('LOBBY')}>
             <div className="w-12 h-12 bg-brand-oxblood rounded-xl flex items-center justify-center shadow-lg border border-white/10 transform hover:scale-105 transition-transform">
               <Skull className="text-white" size={28} strokeWidth={2.5} />
             </div>
@@ -224,7 +247,7 @@ export default function App() {
                 variant="ghost"
                 onClick={() => {
                   if (window.confirm(t('return_home_confirm'))) {
-                    setView('LOBBY');
+                    navigateTo('LOBBY');
                   }
                 }}
                 className="text-white hover:text-brand-teal"
@@ -241,8 +264,8 @@ export default function App() {
 
       <div className="max-w-[1600px] mx-auto p-4 md:p-6 relative z-10">
         {view === 'LOBBY' && <Lobby onNewVoyage={handleNewVoyage} onSelectGame={handleSelectGame} />}
-        {view === 'SETUP' && <Setup onBack={() => setView('LOBBY')} onStart={(g) => { setGame(g); setView('PLAY'); }} />}
-        {view === 'PLAY' && <GameLoop game={game} onExit={() => { clearGame(); setView('LOBBY'); }} setGame={setGame} />}
+        {view === 'SETUP' && <Setup onBack={() => navigateTo('LOBBY')} onStart={(g) => { setGame(g); navigateTo('PLAY'); }} />}
+        {view === 'PLAY' && <GameLoop game={game} onExit={() => { clearGame(); navigateTo('LOBBY'); }} setGame={setGame} />}
       </div>
     </div>
   );
