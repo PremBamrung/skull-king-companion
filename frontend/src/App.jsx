@@ -4,7 +4,7 @@ import { api } from './api';
 import { Button, Card, Input, Badge, cn } from './components/UI';
 import {
   Skull, Anchor, Scroll, Trophy, Users, ChevronRight, Minus, Plus,
-  HelpCircle, X, Swords, Crown, RotateCcw, Info, Trash2, Home, LineChart, Edit
+  HelpCircle, X, Swords, Crown, RotateCcw, Info, Trash2, Home, LineChart, Edit, Target
 } from 'lucide-react';
 import {
   LineChart as ReChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -356,6 +356,7 @@ function GameLoop({ game, onExit, setGame }) {
   const [tricks, setTricks] = useState({});
   const [bonuses, setBonuses] = useState({});
   const [kraken, setKraken] = useState(false);
+  const [showGraph, setShowGraph] = useState(false);
 
   if (!game || !game.rounds || game.rounds.length === 0) {
     return <div className="p-12 text-center text-parchment">Loading voyage details...</div>;
@@ -371,6 +372,7 @@ function GameLoop({ game, onExit, setGame }) {
   // Let's look at the game object structure from previous reads.
   // game.rounds is a list.
   const currentRound = game.rounds.find(r => !r.player_stats || r.player_stats.length === 0) || game.rounds[game.rounds.length - 1];
+  const activeRoundNum = editingRoundNum || currentRound.round_number;
   const isRoundComplete = currentRound.player_stats && currentRound.player_stats.length > 0;
   
   // If round is complete, we are in "Review/Scoreboard" mode or need to go to next round?
@@ -443,7 +445,7 @@ function GameLoop({ game, onExit, setGame }) {
   // --- RENDERING ---
   
   // 1. GAME OVER VIEW
-  if (game.status === 'COMPLETED') {
+  if (game.status === 'COMPLETED' && !editingRoundNum) {
     const leader = [...game.players].sort((a, b) => {
       const scoreA = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === a.id)?.round_score || 0), 0);
       const scoreB = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === b.id)?.round_score || 0), 0);
@@ -475,7 +477,9 @@ function GameLoop({ game, onExit, setGame }) {
   }
 
   // 2. ACTIVE GAME VIEW
-  const [showGraph, setShowGraph] = useState(false);
+  // Dealer Calculation: (Round - 1) % PlayerCount
+  // Note: If editing a round, we should calculate based on THAT round number
+  const dealerIndex = (activeRoundNum - 1) % game.players.length;
 
   return (
     <div className="grid lg:grid-cols-4 gap-8 items-start">
@@ -496,14 +500,22 @@ function GameLoop({ game, onExit, setGame }) {
             {/* Header for Round */}
             <div className="flex items-center justify-between mb-2">
                 <div>
-                   <h2 className="text-3xl font-bold text-brand-navy flex items-center gap-3 font-serif">
-                       {localPhase === 'BID' ? <Swords className="text-brand-oxblood" size={32} /> : <Crown className="text-suit-yellow" size={32} />}
-                       {localPhase === 'BID' ? 'Bidding Phase' : 'Resolution Phase'}
-                   </h2>
-                   <p className="text-brand-slate text-sm font-sans tracking-widest mt-1 font-bold uppercase">ROUND {currentRound.round_number} • {currentRound.card_count} CARDS</p>
+                   <div className="flex items-center gap-3">
+                       <h2 className="text-3xl font-bold text-brand-navy flex items-center gap-3 font-serif">
+                           {editingRoundNum ? <Edit className="text-brand-teal" size={32} /> : (localPhase === 'BID' ? <Swords className="text-brand-oxblood" size={32} /> : <Crown className="text-suit-yellow" size={32} />)}
+                           {editingRoundNum ? `Editing Round ${editingRoundNum}` : (localPhase === 'BID' ? 'Bidding Phase' : 'Resolution Phase')}
+                       </h2>
+                   </div>
+                   <p className="text-brand-slate text-sm font-sans tracking-widest mt-1 font-bold uppercase">
+                       {editingRoundNum ? 'CORRECTING THE LOGS' : `ROUND ${currentRound.round_number} • ${currentRound.card_count} CARDS`}
+                   </p>
                 </div>
                  <div className="flex gap-2">
-                     <Button variant="danger" onClick={undoLast} className="px-3"><RotateCcw size={16}/></Button>
+                     {editingRoundNum ? (
+                         <Button variant="secondary" onClick={() => { setEditingRoundNum(null); setLocalPhase('BID'); }} className="px-3">Cancel Edit</Button>
+                     ) : (
+                         <Button variant="danger" onClick={undoLast} className="px-3" title="Undo Last Round"><RotateCcw size={16}/></Button>
+                     )}
                  </div>
             </div>
 
@@ -511,13 +523,17 @@ function GameLoop({ game, onExit, setGame }) {
             {localPhase === 'BID' && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24 lg:mb-0">
-                        {game.players.map(player => {
+                        {game.players.map((player, idx) => {
                             const currentBid = bids[player.id] ?? 0;
+                            const isDealer = idx === dealerIndex;
                             return (
-                                <Card key={player.id} className="p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-brand-teal/30">
+                                <Card key={player.id} className={`p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-brand-teal/30 ${isDealer ? 'ring-2 ring-brand-teal/20 bg-brand-teal/5' : ''}`}>
                                     <div className="absolute top-0 left-0 right-0 h-1 bg-brand-teal opacity-0 group-hover:opacity-100 transition-opacity" />
                                     <div className="font-bold text-xl text-brand-navy border-b border-brand-charcoal/5 pb-2 flex justify-between items-center font-serif">
-                                        {player.name}
+                                        <div className="flex items-center gap-2">
+                                            {player.name}
+                                            {isDealer && <Badge className="bg-brand-teal text-white text-xs">DEALER</Badge>}
+                                        </div>
                                     </div>
                                     <div className="flex items-center justify-between gap-4 bg-brand-navy/5 p-3 rounded-xl border border-brand-charcoal/5">
                                         <button
@@ -555,17 +571,23 @@ function GameLoop({ game, onExit, setGame }) {
             {localPhase === 'RESOLUTION' && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-24 lg:mb-0">
-                        {game.players.map(player => {
+                        {game.players.map((player, idx) => {
                             const playerTricks = tricks[player.id] ?? 0;
                             const bid = bids[player.id] ?? 0;
                             const bonus = bonuses[player.id] ?? 0;
                             const totalTricksEntered = Object.values(tricks).reduce((a,b)=>a+b,0);
-                            const canAddTrick = totalTricksEntered < currentRound.round_number;
+                            // If editing, use the editing round number, otherwise current
+                            const targetRoundNum = editingRoundNum || currentRound.round_number;
+                            const canAddTrick = totalTricksEntered < targetRoundNum;
+                            const isDealer = idx === dealerIndex;
 
                             return (
-                                <Card key={player.id} className="p-6 space-y-4 hover:border-brand-teal/30 transition-colors">
+                                <Card key={player.id} className={`p-6 space-y-4 hover:border-brand-teal/30 transition-colors ${isDealer ? 'ring-2 ring-brand-teal/20 bg-brand-teal/5' : ''}`}>
                                     <div className="flex justify-between items-center border-b border-brand-charcoal/5 pb-3">
-                                        <span className="font-bold text-2xl text-brand-navy font-serif">{player.name}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-bold text-2xl text-brand-navy font-serif">{player.name}</span>
+                                            {isDealer && <Badge className="bg-brand-teal text-white text-xs">DEALER</Badge>}
+                                        </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs text-brand-slate uppercase font-bold tracking-wider">Bid</span>
                                             <span className={`text-xl font-mono font-bold px-4 py-1 rounded-lg bg-brand-navy border border-brand-teal/20 ${bid === 0 ? 'text-brand-teal' : 'text-white'}`}>
@@ -588,7 +610,7 @@ function GameLoop({ game, onExit, setGame }) {
                                                     {playerTricks}
                                                 </span>
                                                 <button
-                                                    onClick={() => setTricks({ ...tricks, [player.id]: Math.min(currentRound.round_number, playerTricks + 1) })}
+                                                    onClick={() => setTricks({ ...tricks, [player.id]: Math.min(targetRoundNum, playerTricks + 1) })}
                                                     disabled={!canAddTrick}
                                                     className="w-12 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-md"
                                                 >
@@ -635,16 +657,25 @@ function GameLoop({ game, onExit, setGame }) {
                              />
                              <label htmlFor="kraken" className="text-sm font-bold">Kraken/Whale Played (Bypass Check)</label>
                         </div>
+
+                        {/* Validation Error Message */}
+                        {!kraken && Object.values(tricks).reduce((a,b)=>a+b,0) !== (editingRoundNum || currentRound.round_number) && (
+                            <div className="flex items-center gap-2 text-brand-oxblood font-bold bg-brand-oxblood/10 px-4 py-2 rounded-lg border border-brand-oxblood/20 animate-in slide-in-from-bottom-2">
+                                <Info size={18} />
+                                <span>Tricks claimed: {Object.values(tricks).reduce((a,b)=>a+b,0)} / {editingRoundNum || currentRound.round_number}</span>
+                            </div>
+                        )}
+
                         <div className="flex w-full lg:w-auto gap-4">
                              <Button onClick={() => setLocalPhase('BID')} variant="secondary" className="flex-1 lg:flex-none">
                                 Back to Bids
                             </Button>
                             <Button
                                 onClick={submitGameRound}
-                                disabled={!kraken && Object.values(tricks).reduce((a,b)=>a+b,0) !== currentRound.round_number}
+                                disabled={!kraken && Object.values(tricks).reduce((a,b)=>a+b,0) !== (editingRoundNum || currentRound.round_number)}
                                 className="flex-[2] lg:flex-none lg:w-auto lg:px-12 text-xl shadow-xl"
                             >
-                                Finish Round {currentRound.round_number} <ChevronRight size={24} />
+                                {editingRoundNum ? 'Update Round' : `Finish Round ${currentRound.round_number}`} <ChevronRight size={24} />
                             </Button>
                         </div>
                     </div>
@@ -668,18 +699,18 @@ function GameLoop({ game, onExit, setGame }) {
                             <span>Tricks Accounted For</span>
                         </div>
                         <div className="flex items-center justify-between">
-                            <span className={`text-2xl font-bold ${Object.values(tricks).reduce((a,b)=>a+b,0) === currentRound.round_number ? 'text-suit-green' : 'text-brand-navy'}`}>
+                            <span className={`text-2xl font-bold ${Object.values(tricks).reduce((a,b)=>a+b,0) === activeRoundNum ? 'text-suit-green' : 'text-brand-navy'}`}>
                                 {Object.values(tricks).reduce((a,b)=>a+b,0)}
-                                <span className="text-brand-slate text-lg"> / {currentRound.round_number}</span>
+                                <span className="text-brand-slate text-lg"> / {activeRoundNum}</span>
                             </span>
-                             {Object.values(tricks).reduce((a,b)=>a+b,0) === currentRound.round_number && <Crown size={20} className="text-suit-yellow" />}
+                             {Object.values(tricks).reduce((a,b)=>a+b,0) === activeRoundNum && <Crown size={20} className="text-suit-yellow" />}
                         </div>
                      </div>
                  )}
             </Card>
             
             <ScoreGraph game={game} />
-            <Leaderboard game={game} compact onEditRound={startEditRound} />
+            <Leaderboard game={game} onEditRound={startEditRound} />
         </aside>
     </div>
   );
