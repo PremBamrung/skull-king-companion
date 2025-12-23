@@ -8,11 +8,10 @@ The goal is to move beyond a simple spreadsheet and create an immersive, pirate-
 
 ### **Infrastructure (Docker Compose)**
 
-The application will run as three isolated containers orchestrated via `docker-compose.yml`.
+The application will run as two isolated containers orchestrated via `docker-compose.yml`.
 
-1. **`db`**: PostgreSQL 16 (Alpine). Chosen for JSONB support (useful for variable game configs) and robust relational integrity.
-2. **`backend`**: Python 3.11 + FastAPI. Running on `uvicorn`.
-3. **`frontend`**: React (Vite) + TypeScript. Served via a lightweight Nginx container for production-like simulation.
+1. **`backend`**: Python 3.11 + FastAPI. Running on `uvicorn`. Includes a persistent SQLite database.
+2. **`frontend`**: React (Vite). Served via a development server or a lightweight Nginx container for production-like simulation.
 
 ### **Frontend Technologies**
 
@@ -31,9 +30,9 @@ The application will run as three isolated containers orchestrated via `docker-c
 
 ---
 
-# 2. Database Schema (PostgreSQL)
+# 2. Database Schema (SQLite)
 
-We need a relational structure that supports game history and detailed round analytics.
+We need a relational structure that supports game history and detailed round analytics. SQLite is used for its simplicity and portability, with the database file stored in a shared volume.
 
 ### **Table: `games**`
 
