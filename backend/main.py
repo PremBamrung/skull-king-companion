@@ -10,6 +10,7 @@ from database import engine, create_db_and_tables, get_session
 from models import Game, Player, Round, RoundPlayerStats, GameStatus
 from scoring import ScoringService
 from pydantic import BaseModel
+from seed import seed_data
 
 # Response Models with Relationships
 class RoundPlayerStatsRead(BaseModel):
@@ -47,6 +48,9 @@ class GameRead(BaseModel):
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     create_db_and_tables()
+    # Seed mock data
+    with Session(engine) as session:
+        seed_data(session)
     yield
 
 app = FastAPI(lifespan=lifespan)
