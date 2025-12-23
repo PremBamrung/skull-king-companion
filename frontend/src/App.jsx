@@ -122,6 +122,7 @@ const RulesModal = ({ onClose }) => {
               </div>
               <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-suit-black border border-white"></div><span className="flex-1"><strong>{t('trump')}:</strong> {t('trump_desc')}</span></div>
               <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-cyan-500 border border-white"></div><span className="flex-1"><strong>{t('mermaid')}:</strong> {t('mermaid_desc')}</span></div>
+              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-orange-500 border border-white"></div><span className="flex-1"><strong>{t('tigress')}:</strong> {t('tigress_desc')}</span></div>
               <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-brand-oxblood border border-white"></div><span className="flex-1"><strong>{t('pirate')}:</strong> {t('pirate_desc')}</span></div>
               <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-suit-yellow border border-white"></div><span className="flex-1"><strong>{t('skull_king')}:</strong> {t('skull_king_desc')}</span></div>
               <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-full bg-white border border-brand-charcoal/20"></div><span className="flex-1"><strong>{t('escape')}:</strong> {t('escape_desc')}</span></div>
