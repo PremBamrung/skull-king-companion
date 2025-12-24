@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import List, Optional, Dict
 from uuid import UUID, uuid4
@@ -14,8 +14,8 @@ class GameStatus(str, Enum):
 class Game(SQLModel, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     status: GameStatus = Field(default=GameStatus.SETUP)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    last_accessed: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    last_accessed: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     rules_config: Dict = Field(default={}, sa_column=Column(JSON))
     
     players: List["Player"] = Relationship(back_populates="game", sa_relationship_kwargs={"cascade": "all, delete-orphan"})

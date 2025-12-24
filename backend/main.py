@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Optional
 from uuid import UUID
 from fastapi import FastAPI, Depends, HTTPException
@@ -117,7 +117,7 @@ def get_game(game_id: UUID, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Game not found")
     
     # Update last accessed
-    game.last_accessed = datetime.utcnow()
+    game.last_accessed = datetime.now(timezone.utc)
     session.add(game)
     session.commit()
     session.refresh(game)
@@ -191,7 +191,7 @@ def submit_round(
     else:
         game.status = GameStatus.COMPLETED
 
-    game.last_accessed = datetime.utcnow()
+    game.last_accessed = datetime.now(timezone.utc)
     session.add(game)
     session.commit()
     session.refresh(game)
@@ -252,7 +252,7 @@ def update_round(
     
     session.commit()
     
-    game.last_accessed = datetime.utcnow()
+    game.last_accessed = datetime.now(timezone.utc)
     session.add(game)
     session.commit()
 

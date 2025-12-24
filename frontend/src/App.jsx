@@ -330,6 +330,20 @@ function Lobby({ onNewVoyage, onSelectGame }) {
     }
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    // Append 'Z' to force UTC interpretation if missing timezone info
+    const cleanDateString = (dateString.includes('T') && !dateString.endsWith('Z') && !dateString.includes('+')) 
+      ? dateString + 'Z' 
+      : dateString;
+    const date = new Date(cleanDateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    return `${day}/${month}/${year}, ${time}`;
+  };
+
   return (
     <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500 pt-12">
       <div className="grid lg:grid-cols-5 gap-12 items-start">
@@ -360,17 +374,22 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                     onClick={() => onSelectGame(g)}
                     className="bg-white hover:bg-brand-navy/5 border border-brand-slate/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-teal/10 group-hover:text-brand-teal transition-colors">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4 flex-1 min-w-0">
+                      <div className="flex items-start gap-4 flex-shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-teal/10 group-hover:text-brand-teal transition-colors flex-shrink-0">
                           <Anchor size={20} />
                         </div>
-                        <div>
-                          <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
-                            {new Date(g.last_accessed).toLocaleString()}
-                          </p>
-                          <p className="text-xs text-brand-slate uppercase tracking-wider font-bold">
-                            {g.status}
+                        <div className="min-w-[200px]">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] text-brand-slate uppercase tracking-wider font-bold mb-0.5">
+                              {t('last_played')}
+                            </span>
+                            <span className="font-bold text-brand-navy text-sm group-hover:text-brand-teal transition-colors">
+                              {formatDate(g.last_accessed)}
+                            </span>
+                          </div>
+                          <p className="text-xs text-brand-slate uppercase tracking-wider font-bold mt-1">
+                            {t(g.status.toLowerCase())}
                             {g.status === 'ACTIVE' && (
                               <span className="ml-2 text-brand-teal">
                                 • {t('round')} {g.rounds.find(r => !r.player_stats || r.player_stats.length === 0)?.round_number || g.rounds.length}/10
@@ -392,7 +411,8 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                           </p>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-2 sm:ml-auto">
+                      
+                      <div className="flex flex-wrap gap-2 lg:ml-auto">
                         {g.players
                           .map(p => {
                             const latestStat = g.rounds
@@ -408,21 +428,23 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                               <div 
                                 key={p.id} 
                                 className={cn(
-                                  "flex items-center gap-1.5 px-2 py-1 rounded-md border transition-colors",
+                                  "flex items-center justify-between gap-2 px-2 py-1 rounded-md border transition-colors min-w-[80px]",
                                   isWinner 
                                     ? "bg-suit-yellow/20 border-suit-yellow/50 shadow-sm" 
                                     : "bg-brand-navy/5 border-brand-charcoal/5"
                                 )}
                               >
-                                {isWinner && <Crown size={10} className="text-suit-yellow" />}
+                                <div className="flex items-center gap-1.5 min-w-0">
+                                  {isWinner && <Crown size={10} className="text-suit-yellow flex-shrink-0" />}
+                                  <span className={cn(
+                                    "text-[10px] font-bold truncate",
+                                    isWinner ? "text-brand-navy" : "text-brand-navy"
+                                  )}>
+                                    {p.name}
+                                  </span>
+                                </div>
                                 <span className={cn(
-                                  "text-[10px] font-bold truncate max-w-[60px]",
-                                  isWinner ? "text-brand-navy" : "text-brand-navy"
-                                )}>
-                                  {p.name}
-                                </span>
-                                <span className={cn(
-                                  "text-[10px] font-mono font-bold", 
+                                  "text-[10px] font-mono font-bold ml-1", 
                                   isWinner ? "text-brand-navy" : (p.score >= 0 ? "text-suit-green" : "text-brand-oxblood")
                                 )}>
                                   {p.score}

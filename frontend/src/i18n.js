@@ -10,6 +10,7 @@ export const translations = {
     start_new_voyage: "Start New Voyage",
     captains_log: "Captain's Log",
     sink_ship_confirm: "Are you sure you want to sink this ship? (Delete game)",
+    last_played: "Last Played",
     
     // Setup
     assemble_crew: "Assemble The Crew",
@@ -90,7 +91,10 @@ export const translations = {
     the_kraken_desc: "If played, the entire trick is destroyed. No one wins it. The next trick starts with the same person who started the Kraken trick.",
     bid: "Bid",
     dealer: "DEALER",
-    unknown: "Unknown"
+    unknown: "Unknown",
+    active: "ACTIVE",
+    completed: "COMPLETED",
+    setup: "SETUP"
   },
   fr: {
     // Header
@@ -103,6 +107,7 @@ export const translations = {
     start_new_voyage: "Nouveau Voyage",
     captains_log: "Journal de Bord",
     sink_ship_confirm: "Êtes-vous sûr de vouloir couler ce navire ? (Supprimer la partie)",
+    last_played: "Dernière Partie",
     
     // Setup
     assemble_crew: "Assemblez l'Équipage",
@@ -183,6 +188,9 @@ export const translations = {
     the_kraken_desc: "Si joué, le pli est détruit. Personne ne le gagne. Le pli suivant commence par la même personne.",
     bid: "Mise",
     dealer: "DONNEUR",
-    unknown: "Inconnu"
+    unknown: "Inconnu",
+    active: "EN COURS",
+    completed: "TERMINÉ",
+    setup: "CONFIGURATION"
   }
 };
