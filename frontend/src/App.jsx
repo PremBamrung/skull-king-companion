@@ -514,7 +514,8 @@ function GameLoop({ game, onExit, setGame }) {
   const currentRound = game.rounds.find(r => !r.player_stats || r.player_stats.length === 0) || game.rounds[game.rounds.length - 1];
   const activeRoundNum = editingRoundNum || currentRound.round_number;
   const isRoundComplete = currentRound.player_stats && currentRound.player_stats.length > 0;
-  
+  const totalBids = Object.values(bids).reduce((a, b) => a + b, 0);
+
   useEffect(() => {
      setBids({});
      setTricks({});
@@ -811,13 +812,6 @@ function GameLoop({ game, onExit, setGame }) {
                              <label htmlFor="kraken" className="text-sm font-bold">{t('kraken_played')}</label>
                         </div>
 
-                        {!kraken && Object.values(tricks).reduce((a,b)=>a+b,0) !== (editingRoundNum || currentRound.round_number) && (
-                            <div className="flex items-center gap-2 text-brand-oxblood font-bold bg-brand-oxblood/10 px-4 py-2 rounded-lg border border-brand-oxblood/20 animate-in slide-in-from-bottom-2">
-                                <Info size={18} />
-                                <span>{t('tricks_claimed')}: {Object.values(tricks).reduce((a,b)=>a+b,0)} / {editingRoundNum || currentRound.round_number}</span>
-                            </div>
-                        )}
-
                         <div className="flex w-full lg:w-auto gap-4">
                              <Button onClick={() => setLocalPhase('BID')} variant="secondary" className="flex-1 lg:flex-none">
                                 {t('back_to_bids')}
@@ -843,6 +837,21 @@ function GameLoop({ game, onExit, setGame }) {
                     <span className="text-5xl font-bold text-brand-navy font-serif">{currentRound.round_number}</span>
                     <span className="text-brand-slate text-xl font-bold">/ 10</span>
                  </div>
+
+                 {localPhase === 'BID' && (
+                     <div className="bg-brand-navy/5 rounded-lg p-4 border border-brand-charcoal/5 mt-4">
+                        <div className="flex justify-between text-sm mb-2 text-brand-slate font-medium">
+                            <span>{t('total_bids')}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <span className={`text-2xl font-bold ${totalBids > activeRoundNum ? 'text-brand-oxblood' : totalBids < activeRoundNum ? 'text-brand-teal' : 'text-suit-green'}`}>
+                                {totalBids}
+                                <span className="text-brand-slate text-lg"> / {activeRoundNum}</span>
+                            </span>
+                             {totalBids === activeRoundNum && <Target size={20} className="text-suit-green" />}
+                        </div>
+                     </div>
+                 )}
                  
                  {localPhase === 'RESOLUTION' && (
                      <div className="bg-brand-navy/5 rounded-lg p-4 border border-brand-charcoal/5 mt-4">
