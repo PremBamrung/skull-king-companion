@@ -360,15 +360,76 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                     onClick={() => onSelectGame(g)}
                     className="bg-white hover:bg-brand-navy/5 border border-brand-slate/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-lg bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-teal/10 group-hover:text-brand-teal transition-colors">
-                        <Anchor size={20} />
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-4 flex-1">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-brand-navy/5 flex items-center justify-center text-brand-navy group-hover:bg-brand-teal/10 group-hover:text-brand-teal transition-colors">
+                          <Anchor size={20} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
+                            {new Date(g.last_accessed).toLocaleString()}
+                          </p>
+                          <p className="text-xs text-brand-slate uppercase tracking-wider font-bold">
+                            {g.status}
+                            {g.status === 'ACTIVE' && (
+                              <span className="ml-2 text-brand-teal">
+                                • {t('round')} {g.rounds.find(r => !r.player_stats || r.player_stats.length === 0)?.round_number || g.rounds.length}/10
+                              </span>
+                            )}
+                            {g.status === 'COMPLETED' && (
+                              <span className="ml-2 text-brand-slate/60">
+                                • {(() => {
+                                  const start = new Date(g.created_at);
+                                  const end = new Date(g.last_accessed);
+                                  const diffMs = end - start;
+                                  const diffMins = Math.floor(diffMs / 60000);
+                                  const hours = Math.floor(diffMins / 60) ;
+                                  const mins = diffMins % 60;
+                                  return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                                })()}
+                              </span>
+                            )}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold text-brand-navy group-hover:text-brand-teal transition-colors">
-                          {new Date(g.last_accessed).toLocaleString()}
-                        </p>
-                        <p className="text-xs text-brand-slate uppercase tracking-wider font-bold">{g.status}</p>
+                      <div className="flex flex-wrap gap-2 sm:ml-auto">
+                        {g.players
+                          .map(p => {
+                            const latestStat = g.rounds
+                              .filter(r => r.player_stats && r.player_stats.length > 0)
+                              .sort((a, b) => b.round_number - a.round_number)[0]
+                              ?.player_stats.find(s => s.player_id === p.id);
+                            return { ...p, score: latestStat?.total_score_snapshot || 0 };
+                          })
+                          .sort((a, b) => b.score - a.score)
+                          .map((p, idx) => {
+                            const isWinner = g.status === 'COMPLETED' && idx === 0;
+                            return (
+                              <div 
+                                key={p.id} 
+                                className={cn(
+                                  "flex items-center gap-1.5 px-2 py-1 rounded-md border transition-colors",
+                                  isWinner 
+                                    ? "bg-suit-yellow/20 border-suit-yellow/50 shadow-sm" 
+                                    : "bg-brand-navy/5 border-brand-charcoal/5"
+                                )}
+                              >
+                                {isWinner && <Crown size={10} className="text-suit-yellow" />}
+                                <span className={cn(
+                                  "text-[10px] font-bold truncate max-w-[60px]",
+                                  isWinner ? "text-brand-navy" : "text-brand-navy"
+                                )}>
+                                  {p.name}
+                                </span>
+                                <span className={cn(
+                                  "text-[10px] font-mono font-bold", 
+                                  isWinner ? "text-brand-navy" : (p.score >= 0 ? "text-suit-green" : "text-brand-oxblood")
+                                )}>
+                                  {p.score}
+                                </span>
+                              </div>
+                            );
+                          })}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
