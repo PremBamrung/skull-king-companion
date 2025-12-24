@@ -731,9 +731,10 @@ function GameLoop({ game, onExit, setGame }) {
                             const playerTricks = tricks[player.id] ?? 0;
                             const bid = bids[player.id] ?? 0;
                             const bonus = bonuses[player.id] ?? 0;
-                            const totalTricksEntered = Object.values(tricks).reduce((a,b)=>a+b,0);
+                            const totalTricksEntered = Object.values(tricks).reduce((a, b) => a + b, 0);
                             const targetRoundNum = editingRoundNum || currentRound.round_number;
-                            const canAddTrick = totalTricksEntered < targetRoundNum;
+                            const maxAllowedTricks = kraken ? targetRoundNum - 1 : targetRoundNum;
+                            const canAddTrick = totalTricksEntered < maxAllowedTricks;
                             const isDealer = idx === dealerIndex;
 
                             return (
@@ -818,7 +819,11 @@ function GameLoop({ game, onExit, setGame }) {
                             </Button>
                             <Button
                                 onClick={submitGameRound}
-                                disabled={!kraken && Object.values(tricks).reduce((a,b)=>a+b,0) !== (editingRoundNum || currentRound.round_number)}
+                                disabled={
+                                  kraken 
+                                    ? Object.values(tricks).reduce((a,b)=>a+b,0) !== (editingRoundNum || currentRound.round_number) - 1
+                                    : Object.values(tricks).reduce((a,b)=>a+b,0) !== (editingRoundNum || currentRound.round_number)
+                                }
                                 className="flex-[2] lg:flex-none lg:w-auto lg:px-12 text-xl shadow-xl"
                             >
                                 {editingRoundNum ? t('update_round') : `${t('finish_round')} ${currentRound.round_number}`} <ChevronRight size={24} />

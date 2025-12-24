@@ -144,10 +144,11 @@ def submit_round(
 
     # Validation
     total_tricks = sum(p.tricks for p in data.player_stats)
-    if not data.kraken_played and total_tricks != round_obj.card_count:
+    expected_tricks = round_obj.card_count - 1 if data.kraken_played else round_obj.card_count
+    if total_tricks != expected_tricks:
         raise HTTPException(
             status_code=400, 
-            detail=f"Total tricks ({total_tricks}) does not match card count ({round_obj.card_count})."
+            detail=f"Total tricks ({total_tricks}) does not match expected ({expected_tricks})."
         )
 
     # Process scores
@@ -221,8 +222,9 @@ def update_round(
     # Re-submit with new data
     # (Simplified: we'll just reuse the core logic but without adding a next round)
     total_tricks = sum(p.tricks for p in data.player_stats)
-    if not data.kraken_played and total_tricks != round_obj.card_count:
-        raise HTTPException(status_code=400, detail="Invalid trick count")
+    expected_tricks = round_obj.card_count - 1 if data.kraken_played else round_obj.card_count
+    if total_tricks != expected_tricks:
+        raise HTTPException(status_code=400, detail=f"Invalid trick count (expected {expected_tricks})")
 
     for p_stat in data.player_stats:
         score = ScoringService.calculate_score(
