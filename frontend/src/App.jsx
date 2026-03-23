@@ -898,16 +898,22 @@ function GameLoop({ game, onExit, setGame }) {
 
                                         <div className="flex flex-col justify-center">
                                             <label className="text-xs text-brand-slate uppercase font-bold mb-2 tracking-wider">{t('bonus_pts')}</label>
-                                            <div className="flex items-center gap-1.5 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5">
-                                                {[0, 10, 20, 30, 40].map(val => (
-                                                    <button
-                                                        key={val}
-                                                        onClick={() => setBonuses({ ...bonuses, [player.id]: val })}
-                                                        className={`flex-1 h-10 rounded-lg text-sm font-bold font-mono transition-all active:scale-95 ${bonus === val ? 'bg-brand-teal text-white shadow-md' : 'bg-white text-brand-slate hover:bg-brand-navy/10 border border-brand-charcoal/10'}`}
-                                                    >
-                                                        {val === 0 ? '0' : `+${val}`}
-                                                    </button>
-                                                ))}
+                                            <div className="flex items-center gap-2 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5 h-[66px]">
+                                                <button
+                                                    onClick={() => setBonuses({ ...bonuses, [player.id]: Math.max(0, bonus - 10) })}
+                                                    className="w-10 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white transition-colors active:scale-95 shadow-sm"
+                                                >
+                                                    <Minus size={16} />
+                                                </button>
+                                                <span className="flex-1 text-center font-bold text-xl font-mono text-brand-teal">
+                                                    {bonus}
+                                                </span>
+                                                <button
+                                                    onClick={() => setBonuses({ ...bonuses, [player.id]: bonus + 10 })}
+                                                    className="w-10 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white transition-colors active:scale-95 shadow-sm"
+                                                >
+                                                    <Plus size={16} />
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
