@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import confetti from 'canvas-confetti';
 import { useGameStore } from './store';
 import { api } from './api';
 import { translations } from './i18n';
@@ -102,7 +103,7 @@ const RulesModal = ({ onClose }) => {
       <div className="bg-brand-parchment border border-brand-slate/20 w-full max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl animate-in fade-in zoom-in duration-200 flex flex-col">
         <div className="sticky top-0 bg-brand-navy p-6 border-b border-brand-teal/20 flex justify-between items-center z-10">
           <h2 className="text-2xl font-bold text-white flex items-center gap-3 font-serif">
-            <Scroll size={24} className="text-brand-teal" /> {t('captains_log')}
+            <Scroll size={24} className="text-brand-teal" /> {t('rules')}
           </h2>
           <button onClick={onClose} className="text-white/60 hover:text-white p-2 hover:bg-white/10 rounded-lg transition-colors">
             <X size={24} />
@@ -362,6 +363,17 @@ function Lobby({ onNewVoyage, onSelectGame }) {
         </div>
 
         <div className="lg:col-span-3">
+          {history.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-64 text-center gap-4 text-brand-slate">
+              <div className="w-16 h-16 rounded-2xl bg-brand-navy/5 flex items-center justify-center">
+                <Anchor size={32} className="text-brand-slate/40" />
+              </div>
+              <div>
+                <p className="font-bold text-brand-navy font-serif text-lg">{t('no_voyages_yet')}</p>
+                <p className="text-sm mt-1">{t('start_first_voyage')}</p>
+              </div>
+            </div>
+          )}
           {history.length > 0 && (
             <div className="text-left">
               <h3 className="text-brand-navy font-bold text-xl mb-4 flex items-center gap-2 font-serif">
@@ -372,7 +384,7 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                   <div
                     key={g.id}
                     onClick={() => onSelectGame(g)}
-                    className="bg-white hover:bg-brand-navy/5 border border-brand-slate/10 p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md"
+                    className={cn("bg-white hover:bg-brand-navy/5 border p-4 rounded-xl cursor-pointer transition-all flex justify-between items-center group shadow-sm hover:shadow-md border-brand-slate/10", g.status === 'ACTIVE' && "border-l-4 border-l-brand-teal")}
                   >
                     <div className="flex flex-col lg:flex-row lg:items-center gap-4 flex-1 min-w-0">
                       <div className="flex items-start gap-4 flex-shrink-0">
@@ -404,7 +416,7 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                                   const diffMins = Math.floor(diffMs / 60000);
                                   const hours = Math.floor(diffMins / 60) ;
                                   const mins = diffMins % 60;
-                                  return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+                                  return hours > 0 ? `${hours}h ${mins}m` : diffMins < 1 ? '< 1m' : `${mins}m`;
                                 })()}
                               </span>
                             )}
@@ -585,6 +597,7 @@ function GameLoop({ game, onExit, setGame }) {
   const [localPhase, setLocalPhase] = useState('BID'); // BID, RESOLUTION
   const [editingRoundNum, setEditingRoundNum] = useState(null);
   const [bids, setBids] = useState({});
+  const [touchedBids, setTouchedBids] = useState(new Set());
   const [tricks, setTricks] = useState({});
   const [bonuses, setBonuses] = useState({});
   const [kraken, setKraken] = useState(false);
@@ -601,6 +614,7 @@ function GameLoop({ game, onExit, setGame }) {
 
   useEffect(() => {
      setBids({});
+     setTouchedBids(new Set());
      setTricks({});
      setBonuses({});
      setKraken(false);
@@ -662,6 +676,11 @@ function GameLoop({ game, onExit, setGame }) {
       const scoreB = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === b.id)?.round_score || 0), 0);
       return scoreB - scoreA;
     })[0];
+
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    }, [game.id]);
 
     return (
       <div className="max-w-[1600px] mx-auto space-y-8 animate-in zoom-in duration-500 pt-12 pb-24">
@@ -730,7 +749,7 @@ function GameLoop({ game, onExit, setGame }) {
         <main className="lg:col-span-3 space-y-6">
             <div className="lg:hidden flex justify-end">
                 <Button variant="secondary" size="sm" onClick={() => setShowGraph(!showGraph)}>
-                    <LineChart size={16} className="mr-2" /> {showGraph ? 'Hide Graph' : 'Show Graph'}
+                    <LineChart size={16} className="mr-2" /> {showGraph ? t('hide_graph') : t('show_graph')}
                 </Button>
             </div>
 
@@ -763,22 +782,23 @@ function GameLoop({ game, onExit, setGame }) {
 
             {localPhase === 'BID' && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24 lg:mb-0">
+                     <div className={`grid grid-cols-2 gap-6 mb-24 lg:mb-0 ${game.players.length >= 7 ? 'lg:grid-cols-4' : game.players.length >= 4 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
                         {game.players.map((player, idx) => {
                             const currentBid = bids[player.id] ?? 0;
                             const isDealer = idx === dealerIndex;
                             return (
-                                <Card key={player.id} className={`p-6 flex flex-col gap-4 relative overflow-hidden group hover:border-brand-teal/30 ${isDealer ? 'ring-2 ring-brand-teal/20 bg-brand-teal/5' : ''}`}>
+                                <Card key={player.id} className={`p-6 flex flex-col gap-4 relative overflow-hidden group transition-all ${isDealer ? 'ring-2 ring-brand-teal/20 bg-brand-teal/5' : touchedBids.has(player.id) ? 'ring-2 ring-brand-navy/30 bg-brand-navy/5' : 'hover:border-brand-teal/30'}`}>
                                     <div className="absolute top-0 left-0 right-0 h-1 bg-brand-teal opacity-0 group-hover:opacity-100 transition-opacity" />
                                     <div className="font-bold text-xl text-brand-navy border-b border-brand-charcoal/5 pb-2 flex justify-between items-center font-serif">
                                         <div className="flex items-center gap-2">
                                             {player.name}
                                             {isDealer && <Badge className="bg-brand-teal text-white text-xs">{t('dealer')}</Badge>}
+                                            {touchedBids.has(player.id) && !isDealer && <span className="text-suit-green text-xs">✓</span>}
                                         </div>
                                     </div>
                                     <div className="flex items-center justify-between gap-4 bg-brand-navy/5 p-3 rounded-xl border border-brand-charcoal/5">
                                         <button
-                                            onClick={() => setBids({ ...bids, [player.id]: Math.max(0, currentBid - 1) })}
+                                            onClick={() => { setBids({ ...bids, [player.id]: Math.max(0, currentBid - 1) }); setTouchedBids(prev => new Set(prev).add(player.id)); }}
                                             className="w-12 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white active:scale-95 transition-all shadow-md"
                                         >
                                             <Minus size={24} />
@@ -787,7 +807,7 @@ function GameLoop({ game, onExit, setGame }) {
                                             {currentBid}
                                         </span>
                                         <button
-                                            onClick={() => setBids({ ...bids, [player.id]: Math.min(currentRound.round_number, currentBid + 1) })}
+                                            onClick={() => { setBids({ ...bids, [player.id]: Math.min(currentRound.round_number, currentBid + 1) }); setTouchedBids(prev => new Set(prev).add(player.id)); }}
                                             className="w-12 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white active:scale-95 transition-all shadow-md"
                                         >
                                             <Plus size={24} />
@@ -797,9 +817,15 @@ function GameLoop({ game, onExit, setGame }) {
                             );
                         })}
                     </div>
-                    <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-brand-slate/10 lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20">
-                        <div className="max-w-[1600px] mx-auto lg:flex lg:justify-end">
-                            <Button onClick={() => setLocalPhase('RESOLUTION')} className="w-full lg:w-auto lg:px-12 text-xl shadow-xl">
+                    <div className={`fixed bottom-0 left-0 right-0 p-4 backdrop-blur-md border-t lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20 transition-colors ${totalBids === activeRoundNum ? 'bg-suit-yellow/20 border-suit-yellow/40' : 'bg-white/80 border-brand-slate/10'}`}>
+                        <div className="max-w-[1600px] mx-auto flex items-center gap-4 lg:justify-end">
+                            <div className="lg:hidden flex items-center gap-2 flex-shrink-0">
+                                <span className={`text-sm font-bold font-mono px-3 py-1.5 rounded-lg border ${totalBids > activeRoundNum ? 'text-brand-oxblood bg-brand-oxblood/10 border-brand-oxblood/20' : totalBids === activeRoundNum ? 'text-brand-oxblood bg-suit-yellow/20 border-suit-yellow/40' : 'text-brand-teal bg-brand-teal/10 border-brand-teal/20'}`}>
+                                    {totalBids} / {activeRoundNum}
+                                </span>
+                                {totalBids === activeRoundNum && <span className="text-[10px] font-bold text-brand-oxblood uppercase tracking-wide">{t('forbidden_total')}</span>}
+                            </div>
+                            <Button onClick={() => setLocalPhase('RESOLUTION')} className="flex-1 lg:flex-none lg:w-auto lg:px-12 text-xl shadow-xl">
                                 {t('confirm_bids')} <Swords size={24} />
                             </Button>
                         </div>
@@ -809,7 +835,7 @@ function GameLoop({ game, onExit, setGame }) {
 
             {localPhase === 'RESOLUTION' && (
                 <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-24 lg:mb-0">
+                    <div className={`grid grid-cols-1 gap-6 mb-24 lg:mb-0 ${game.players.length >= 5 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'}`}>
                         {game.players.map((player, idx) => {
                             const playerTricks = tricks[player.id] ?? 0;
                             const bid = bids[player.id] ?? 0;
@@ -819,13 +845,25 @@ function GameLoop({ game, onExit, setGame }) {
                             const maxAllowedTricks = kraken ? targetRoundNum - 1 : targetRoundNum;
                             const canAddTrick = totalTricksEntered < maxAllowedTricks;
                             const isDealer = idx === dealerIndex;
+                            const cumulativeScore = game.rounds
+                              .filter(r => r.player_stats?.length > 0 && r.round_number < targetRoundNum)
+                              .reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === player.id)?.total_score_snapshot || 0), 0);
+                            const lastRoundSnapshot = game.rounds
+                              .filter(r => r.player_stats?.length > 0 && r.round_number < targetRoundNum)
+                              .sort((a, b) => b.round_number - a.round_number)[0]
+                              ?.player_stats?.find(s => s.player_id === player.id)?.total_score_snapshot ?? 0;
 
                             return (
-                                <Card key={player.id} className={`p-6 space-y-4 hover:border-brand-teal/30 transition-colors ${isDealer ? 'ring-2 ring-brand-teal/20 bg-brand-teal/5' : ''}`}>
+                                <Card key={player.id} className={`p-6 space-y-4 transition-all ${isDealer ? 'ring-2 ring-brand-teal/20 bg-brand-teal/5' : playerTricks === bid ? 'ring-2 ring-suit-green/40 bg-suit-green/5' : 'hover:border-brand-teal/30'}`}>
                                     <div className="flex justify-between items-center border-b border-brand-charcoal/5 pb-3">
                                         <div className="flex items-center gap-2">
                                             <span className="font-bold text-2xl text-brand-navy font-serif">{player.name}</span>
                                             {isDealer && <Badge className="bg-brand-teal text-white text-xs">{t('dealer')}</Badge>}
+                                            {targetRoundNum > 1 && (
+                                              <span className={`text-xs font-mono font-bold ${lastRoundSnapshot >= 0 ? 'text-brand-slate' : 'text-brand-oxblood'}`}>
+                                                ({lastRoundSnapshot > 0 ? '+' : ''}{lastRoundSnapshot}pts)
+                                              </span>
+                                            )}
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-xs text-brand-slate uppercase font-bold tracking-wider">{t('bid')}</span>
@@ -860,22 +898,16 @@ function GameLoop({ game, onExit, setGame }) {
 
                                         <div className="flex flex-col justify-center">
                                             <label className="text-xs text-brand-slate uppercase font-bold mb-2 tracking-wider">{t('bonus_pts')}</label>
-                                            <div className="flex items-center gap-2 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5 h-[66px]">
-                                                <button
-                                                    onClick={() => setBonuses({ ...bonuses, [player.id]: Math.max(0, bonus - 10) })}
-                                                    className="w-10 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white transition-colors active:scale-95 shadow-sm"
-                                                >
-                                                    <Minus size={16} />
-                                                </button>
-                                                <span className="flex-1 text-center font-bold text-xl font-mono text-brand-teal">
-                                                    {bonus}
-                                                </span>
-                                                <button
-                                                    onClick={() => setBonuses({ ...bonuses, [player.id]: bonus + 10 })}
-                                                    className="w-10 h-12 rounded-lg bg-brand-navy hover:bg-brand-charcoal flex items-center justify-center text-white transition-colors active:scale-95 shadow-sm"
-                                                >
-                                                    <Plus size={16} />
-                                                </button>
+                                            <div className="flex items-center gap-1.5 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5">
+                                                {[0, 10, 20, 30, 40].map(val => (
+                                                    <button
+                                                        key={val}
+                                                        onClick={() => setBonuses({ ...bonuses, [player.id]: val })}
+                                                        className={`flex-1 h-10 rounded-lg text-sm font-bold font-mono transition-all active:scale-95 ${bonus === val ? 'bg-brand-teal text-white shadow-md' : 'bg-white text-brand-slate hover:bg-brand-navy/10 border border-brand-charcoal/10'}`}
+                                                    >
+                                                        {val === 0 ? '0' : `+${val}`}
+                                                    </button>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
@@ -978,12 +1010,17 @@ function Leaderboard({ game, compact = false, onEditRound }) {
 
   const isGameCompleted = game.status === 'COMPLETED';
 
+  const lastCompletedRound = game.rounds
+    .filter(r => r.player_stats?.length > 0)
+    .sort((a, b) => b.round_number - a.round_number)[0];
+
   const standings = game.players.map(p => {
     const total = game.rounds.reduce((acc, r) => {
       const stat = r.player_stats?.find(s => s.player_id === p.id);
       return acc + (stat?.round_score || 0);
     }, 0);
-    return { ...p, total };
+    const lastDelta = lastCompletedRound?.player_stats?.find(s => s.player_id === p.id)?.round_score ?? null;
+    return { ...p, total, lastDelta };
   }).sort((a, b) => b.total - a.total);
 
   return (
@@ -1001,7 +1038,14 @@ function Leaderboard({ game, compact = false, onEditRound }) {
                           <tr key={p.id} className="hover:bg-brand-navy/5 transition-colors">
                               <td className="py-3 px-3 w-8 font-mono text-brand-slate font-bold">{i + 1}</td>
                               <td className="py-3 px-3 font-bold text-brand-navy font-serif">{p.name}</td>
-                              <td className="py-3 px-3 text-right font-bold text-brand-teal font-mono text-lg">{p.total}</td>
+                              <td className="py-3 px-3 text-right font-mono">
+                                <span className="font-bold text-brand-teal text-lg">{p.total}</span>
+                                {p.lastDelta !== null && (
+                                  <span className={`ml-1.5 text-xs font-bold ${p.lastDelta >= 0 ? 'text-suit-green' : 'text-brand-oxblood'}`}>
+                                    {p.lastDelta > 0 ? '+' : ''}{p.lastDelta}
+                                  </span>
+                                )}
+                              </td>
                           </tr>
                       ))}
                   </tbody>

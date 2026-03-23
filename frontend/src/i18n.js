@@ -94,7 +94,13 @@ export const translations = {
     unknown: "Unknown",
     active: "ACTIVE",
     completed: "COMPLETED",
-    setup: "SETUP"
+    setup: "SETUP",
+    forbidden_total: "Forbidden total!",
+    show_graph: "Show Graph",
+    hide_graph: "Hide Graph",
+    rules: "Rules",
+    no_voyages_yet: "No voyages yet",
+    start_first_voyage: "Start your first voyage above!"
   },
   fr: {
     // Header
@@ -191,6 +197,12 @@ export const translations = {
     unknown: "Inconnu",
     active: "EN COURS",
     completed: "TERMINÉ",
-    setup: "CONFIGURATION"
+    setup: "CONFIGURATION",
+    forbidden_total: "Total interdit !",
+    show_graph: "Voir Graphe",
+    hide_graph: "Masquer Graphe",
+    rules: "Règles",
+    no_voyages_yet: "Aucun voyage",
+    start_first_voyage: "Commencez votre premier voyage !"
   }
 };
