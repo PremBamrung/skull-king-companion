@@ -47,8 +47,8 @@ export default function ResolutionPhase({ game, bids, tricks, bonuses, kraken, s
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-[1fr_160px] gap-6">
-                <div className="flex flex-col justify-center">
+              <div className="flex flex-wrap gap-4">
+                <div className="flex flex-col justify-center flex-1 min-w-[140px]">
                   <label className="text-xs text-brand-slate uppercase font-bold mb-2 tracking-wider">{t('tricks_won')}</label>
                   <div className="flex items-center gap-3 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5">
                     <button
@@ -70,7 +70,7 @@ export default function ResolutionPhase({ game, bids, tricks, bonuses, kraken, s
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-center">
+                <div className="flex flex-col justify-center w-[160px] shrink-0">
                   <label className="text-xs text-brand-slate uppercase font-bold mb-2 tracking-wider">{t('bonus_pts')}</label>
                   <div className="flex items-center gap-2 bg-brand-navy/5 p-2 rounded-xl border border-brand-charcoal/5 h-[66px]">
                     <button
