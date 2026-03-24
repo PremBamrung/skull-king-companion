@@ -74,6 +74,43 @@ If you prefer to run the services manually:
 2.  Install dependencies: `npm install`.
 3.  Start the dev server: `npm run dev`.
 
+## ✅ Running Tests
+
+This project includes automated tests for both backend and frontend.
+
+### Backend Tests (Pytest)
+
+1. Navigate to `backend/`.
+2. Install dependencies if needed:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. Run tests:
+   ```bash
+   pytest
+   ```
+
+### Frontend Tests (Vitest)
+
+1. Navigate to `frontend/`.
+2. Install dependencies if needed:
+   ```bash
+   npm install
+   ```
+3. Run tests once:
+   ```bash
+   npm test
+   ```
+4. (Optional) Run in watch mode during development:
+   ```bash
+   npm run test:watch
+   ```
+
+### Typical Successful Output
+
+- Backend: all collected `pytest` tests pass (for example, `32 passed`).
+- Frontend: all `vitest` test files pass (for example, `2 passed`, `15 passed` tests).
+
 ## 📜 Rule Processing
 
 The `rule_processing/` directory contains various scripts and markdown files used for extracting and compiling game rules from images and text. This is primarily for development and maintenance of the scoring logic.

@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import create_engine, SQLModel, Session
+from sqlalchemy.pool import StaticPool
 
 from main import app
 from database import get_session
@@ -8,7 +9,12 @@ from database import get_session
 
 @pytest.fixture(name="client")
 def client_fixture():
-    engine = create_engine("sqlite://", connect_args={"check_same_thread": False})
+    # Use a shared in-memory SQLite connection for all sessions in this fixture.
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
     SQLModel.metadata.create_all(engine)
 
     def get_test_session():
