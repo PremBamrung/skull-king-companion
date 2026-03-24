@@ -11,6 +11,7 @@ from models import Game, Player, Round, RoundPlayerStats, GameStatus
 from scoring import ScoringService
 from pydantic import BaseModel
 from seed import seed_data
+from names import generate_game_name
 
 # Response Models with Relationships
 class RoundPlayerStatsRead(BaseModel):
@@ -39,6 +40,7 @@ class PlayerRead(BaseModel):
 class GameRead(BaseModel):
     id: UUID
     status: GameStatus
+    name: Optional[str] = None
     created_at: datetime
     last_accessed: datetime
     rules_config: Dict
@@ -98,7 +100,7 @@ async def root():
 
 @app.post("/api/games", response_model=GameRead)
 def create_game(data: GameCreate, session: Session = Depends(get_session)):
-    game = Game(status=GameStatus.ACTIVE, rules_config=data.config)
+    game = Game(status=GameStatus.ACTIVE, rules_config=data.config, name=generate_game_name())
     session.add(game)
     session.commit()
     session.refresh(game)

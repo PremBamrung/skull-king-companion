@@ -85,9 +85,14 @@ export default function Lobby({ onNewVoyage, onSelectGame }) {
                         </div>
                         <div className="min-w-[200px]">
                           <div className="flex flex-col">
-                            <span className="font-bold text-brand-navy text-sm group-hover:text-brand-teal transition-colors">
-                              {formatDate(g.last_accessed)}
+                            <span className="font-bold text-brand-oxblood text-sm font-mono tracking-tight group-hover:text-brand-oxblood/70 transition-colors">
+                              {g.name ?? formatDate(g.last_accessed)}
                             </span>
+                            {g.name && (
+                              <span className="text-xs text-brand-slate/50 mt-0.5">
+                                {formatDate(g.last_accessed)}
+                              </span>
+                            )}
                           </div>
                           <p className="text-xs text-brand-slate uppercase tracking-wider font-bold mt-1">
                             {t(g.status.toLowerCase())}
