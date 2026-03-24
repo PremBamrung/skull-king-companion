@@ -55,6 +55,7 @@ export default function GameLoop({ game, onExit, setGame }) {
         updated = await api.submitRound(game.id, currentRound.round_number, stats, kraken);
       }
       setGame(updated);
+      setLocalPhase('BID');
     } catch (e) {
       alert(e.response?.data?.detail || 'Error submitting round');
     }
