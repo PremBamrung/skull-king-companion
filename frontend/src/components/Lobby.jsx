@@ -85,9 +85,6 @@ export default function Lobby({ onNewVoyage, onSelectGame }) {
                         </div>
                         <div className="min-w-[200px]">
                           <div className="flex flex-col">
-                            <span className="text-[10px] text-brand-slate uppercase tracking-wider font-bold mb-0.5">
-                              {t('last_played')}
-                            </span>
                             <span className="font-bold text-brand-navy text-sm group-hover:text-brand-teal transition-colors">
                               {formatDate(g.last_accessed)}
                             </span>
@@ -108,7 +105,13 @@ export default function Lobby({ onNewVoyage, onSelectGame }) {
                                   const diffMins = Math.floor(diffMs / 60000);
                                   const hours = Math.floor(diffMins / 60);
                                   const mins = diffMins % 60;
-                                  return hours > 0 ? `${hours}h ${mins}m` : diffMins < 1 ? '< 1m' : `${mins}m`;
+                                  const diffDays = Math.floor(diffMs / 86400000);
+                                  const months = Math.floor(diffDays / 30);
+                                  const remDays = diffDays % 30;
+                                  if (months > 0) return remDays > 0 ? `${months}mo ${remDays}d` : `${months}mo`;
+                                  if (diffDays > 0) return `${diffDays}d`;
+                                  if (hours > 0) return `${hours}h ${mins}m`;
+                                  return diffMins < 1 ? '< 1m' : `${diffMins}m`;
                                 })()}
                               </span>
                             )}
@@ -116,7 +119,7 @@ export default function Lobby({ onNewVoyage, onSelectGame }) {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-3 gap-1.5 lg:ml-auto w-fit">
+                      <div className="flex flex-wrap gap-1.5">
                         {g.players
                           .map(p => {
                             const latestStat = g.rounds
@@ -132,7 +135,7 @@ export default function Lobby({ onNewVoyage, onSelectGame }) {
                               <div
                                 key={p.id}
                                 className={cn(
-                                  "flex items-center justify-between gap-2 px-2 py-1 rounded-md border transition-colors w-[5.5rem]",
+                                  "flex items-center gap-2 px-2 py-1 rounded-md border transition-colors",
                                   isWinner
                                     ? "bg-suit-yellow/20 border-suit-yellow/50 shadow-sm"
                                     : "bg-brand-navy/5 border-brand-charcoal/5"
@@ -140,7 +143,7 @@ export default function Lobby({ onNewVoyage, onSelectGame }) {
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
                                   {isWinner && <Crown size={12} className="text-suit-yellow flex-shrink-0" />}
-                                  <span className="text-xs font-bold truncate text-brand-navy">
+                                  <span className="text-xs font-bold text-brand-navy">
                                     {p.name}
                                   </span>
                                 </div>
