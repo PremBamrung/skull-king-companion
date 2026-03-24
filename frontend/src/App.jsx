@@ -670,17 +670,18 @@ function GameLoop({ game, onExit, setGame }) {
     setGame(updated);
   };
   
+  useEffect(() => {
+    if (game.status === 'COMPLETED' && !editingRoundNum) {
+      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+    }
+  }, [game.status, editingRoundNum, game.id]);
+
   if (game.status === 'COMPLETED' && !editingRoundNum) {
     const leader = [...game.players].sort((a, b) => {
       const scoreA = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === a.id)?.round_score || 0), 0);
       const scoreB = game.rounds.reduce((acc, r) => acc + (r.player_stats?.find(s => s.player_id === b.id)?.round_score || 0), 0);
       return scoreB - scoreA;
     })[0];
-
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    useEffect(() => {
-      confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-    }, [game.id]);
 
     return (
       <div className="max-w-[1600px] 2xl:max-w-[2000px] mx-auto space-y-8 animate-in zoom-in duration-500 pt-12 pb-24">
