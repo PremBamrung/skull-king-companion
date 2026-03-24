@@ -25,6 +25,10 @@
   --highlight-gold: var(--suit-yellow);
 }
 
+html {
+  font-size: clamp(16px, 1.15vw, 22px);
+}
+
 body {
   margin: 0;
   min-width: 320px;

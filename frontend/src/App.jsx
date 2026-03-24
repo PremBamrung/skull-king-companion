@@ -83,7 +83,7 @@ const ScoreGraph = ({ game, variant = 'sidebar' }) => {
         {game.players.map((p, i) => (
           <div key={p.id} className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{ backgroundColor: colors[i % colors.length] }} />
-            <span className="text-[10px] font-bold text-brand-navy truncate max-w-[100px]">
+            <span className="text-xs font-bold text-brand-navy truncate max-w-[100px]">
               {p.name}
             </span>
           </div>
@@ -223,7 +223,7 @@ export default function App() {
 
       {/* Header */}
       <header className="sticky top-0 z-30 bg-brand-navy text-white shadow-xl">
-        <div className="max-w-[1600px] mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
+        <div className="max-w-[1600px] 2xl:max-w-[2000px] mx-auto px-4 md:px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4 cursor-pointer" onClick={() => navigateTo('LOBBY')}>
             <div className="w-12 h-12 bg-brand-oxblood rounded-xl flex items-center justify-center shadow-lg border border-white/10 transform hover:scale-105 transition-transform">
               <Skull className="text-white" size={28} strokeWidth={2.5} />
@@ -263,7 +263,7 @@ export default function App() {
         </div>
       </header>
 
-      <div className="max-w-[1600px] mx-auto p-4 md:p-6 relative z-10">
+      <div className="max-w-[1600px] 2xl:max-w-[2000px] mx-auto p-4 md:p-6 relative z-10">
         {view === 'LOBBY' && <Lobby onNewVoyage={handleNewVoyage} onSelectGame={handleSelectGame} />}
         {view === 'SETUP' && <Setup onBack={() => navigateTo('LOBBY')} onStart={(g) => { setGame(g); navigateTo('PLAY'); }} />}
         {view === 'PLAY' && <GameLoop game={game} onExit={() => { clearGame(); navigateTo('LOBBY'); }} setGame={setGame} />}
@@ -424,7 +424,7 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                         </div>
                       </div>
                       
-                      <div className="flex flex-wrap gap-2 lg:ml-auto">
+                      <div className="grid grid-cols-3 gap-1.5 lg:ml-auto w-fit">
                         {g.players
                           .map(p => {
                             const latestStat = g.rounds
@@ -440,23 +440,23 @@ function Lobby({ onNewVoyage, onSelectGame }) {
                               <div 
                                 key={p.id} 
                                 className={cn(
-                                  "flex items-center justify-between gap-2 px-2 py-1 rounded-md border transition-colors min-w-[80px]",
+                                  "flex items-center justify-between gap-2 px-2 py-1 rounded-md border transition-colors w-[5.5rem]",
                                   isWinner 
                                     ? "bg-suit-yellow/20 border-suit-yellow/50 shadow-sm" 
                                     : "bg-brand-navy/5 border-brand-charcoal/5"
                                 )}
                               >
                                 <div className="flex items-center gap-1.5 min-w-0">
-                                  {isWinner && <Crown size={10} className="text-suit-yellow flex-shrink-0" />}
+                                  {isWinner && <Crown size={12} className="text-suit-yellow flex-shrink-0" />}
                                   <span className={cn(
-                                    "text-[10px] font-bold truncate",
+                                    "text-xs font-bold truncate",
                                     isWinner ? "text-brand-navy" : "text-brand-navy"
                                   )}>
                                     {p.name}
                                   </span>
                                 </div>
                                 <span className={cn(
-                                  "text-[10px] font-mono font-bold ml-1", 
+                                  "text-xs font-mono font-bold ml-1",
                                   isWinner ? "text-brand-navy" : (p.score >= 0 ? "text-suit-green" : "text-brand-oxblood")
                                 )}>
                                   {p.score}
@@ -683,7 +683,7 @@ function GameLoop({ game, onExit, setGame }) {
     }, [game.id]);
 
     return (
-      <div className="max-w-[1600px] mx-auto space-y-8 animate-in zoom-in duration-500 pt-12 pb-24">
+      <div className="max-w-[1600px] 2xl:max-w-[2000px] mx-auto space-y-8 animate-in zoom-in duration-500 pt-12 pb-24">
         <div className="grid lg:grid-cols-4 gap-8 items-start">
           {/* Winner Section */}
           <div className="lg:col-span-1 space-y-8 text-center sticky lg:top-32">
@@ -818,7 +818,7 @@ function GameLoop({ game, onExit, setGame }) {
                         })}
                     </div>
                     <div className={`fixed bottom-0 left-0 right-0 p-4 backdrop-blur-md border-t lg:relative lg:bg-transparent lg:border-0 lg:p-0 lg:mt-8 z-20 transition-colors ${totalBids === activeRoundNum ? 'bg-suit-yellow/20 border-suit-yellow/40' : 'bg-white/80 border-brand-slate/10'}`}>
-                        <div className="max-w-[1600px] mx-auto flex items-center gap-4 lg:justify-end">
+                        <div className="max-w-[1600px] 2xl:max-w-[2000px] mx-auto flex items-center gap-4 lg:justify-end">
                             <div className="lg:hidden flex items-center gap-2 flex-shrink-0">
                                 <span className={`text-sm font-bold font-mono px-3 py-1.5 rounded-lg border ${totalBids > activeRoundNum ? 'text-brand-oxblood bg-brand-oxblood/10 border-brand-oxblood/20' : totalBids === activeRoundNum ? 'text-brand-oxblood bg-suit-yellow/20 border-suit-yellow/40' : 'text-brand-teal bg-brand-teal/10 border-brand-teal/20'}`}>
                                     {totalBids} / {activeRoundNum}
