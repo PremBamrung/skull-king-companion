@@ -82,6 +82,16 @@ class RoundSubmit(BaseModel):
     player_stats: List[PlayerStatInput]
     kraken_played: bool = False
 
+def _get_prev_total(session: Session, game_id: UUID, player_id: UUID, before_round_num: int) -> int:
+    statement = select(RoundPlayerStats).join(Round).where(
+        Round.game_id == game_id,
+        Round.round_number < before_round_num,
+        RoundPlayerStats.player_id == player_id
+    ).order_by(Round.round_number.desc())
+    last_stat = session.exec(statement).first()
+    return last_stat.total_score_snapshot if last_stat else 0
+
+
 @app.get("/")
 async def root():
     return {"message": "Skull King API"}
@@ -162,17 +172,7 @@ def submit_round(
             rules=game.rules_config
         )
         
-        # Get previous total score snapshot
-        prev_total = 0
-        statement = select(RoundPlayerStats).join(Round).where(
-            Round.game_id == game_id,
-            Round.round_number < round_num,
-            RoundPlayerStats.player_id == p_stat.player_id
-        ).order_by(Round.round_number.desc())
-        last_stat = session.exec(statement).first()
-        if last_stat:
-            prev_total = last_stat.total_score_snapshot
-
+        prev_total = _get_prev_total(session, game_id, p_stat.player_id, round_num)
         stat_obj = RoundPlayerStats(
             round_id=round_obj.id,
             player_id=p_stat.player_id,
@@ -232,17 +232,7 @@ def update_round(
             round_cards=round_obj.card_count, rules=game.rules_config
         )
         
-        # Get previous total score snapshot
-        prev_total = 0
-        statement = select(RoundPlayerStats).join(Round).where(
-            Round.game_id == game_id,
-            Round.round_number < round_num,
-            RoundPlayerStats.player_id == p_stat.player_id
-        ).order_by(Round.round_number.desc())
-        last_stat = session.exec(statement).first()
-        if last_stat:
-            prev_total = last_stat.total_score_snapshot
-
+        prev_total = _get_prev_total(session, game_id, p_stat.player_id, round_num)
         stat_obj = RoundPlayerStats(
             round_id=round_obj.id, player_id=p_stat.player_id,
             bid=p_stat.bid, tricks_won=p_stat.tricks, bonus_points=p_stat.bonus,
@@ -264,14 +254,8 @@ def update_round(
             break
             
         for s in nxt_round.player_stats:
-            # prev total for THIS player
-            statement = select(RoundPlayerStats).join(Round).where(
-                Round.game_id == game_id,
-                Round.round_number == r_num - 1,
-                RoundPlayerStats.player_id == s.player_id
-            )
-            prev = session.exec(statement).first()
-            s.total_score_snapshot = (prev.total_score_snapshot if prev else 0) + s.round_score
+            prev_total = _get_prev_total(session, game_id, s.player_id, r_num)
+            s.total_score_snapshot = prev_total + s.round_score
             session.add(s)
         session.commit()
 
