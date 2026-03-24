@@ -29,17 +29,21 @@ export default function ResolutionPhase({ game, bids, tricks, bonuses, kraken, s
 
           return (
             <Card key={player.id} className={`p-6 space-y-4 transition-all ${isDealer ? 'ring-2 ring-brand-teal/20 bg-brand-teal/5' : playerTricks === bid ? 'ring-2 ring-suit-green/40 bg-suit-green/5' : 'hover:border-brand-teal/30'}`}>
-              <div className="flex justify-between items-center border-b border-brand-charcoal/5 pb-3">
-                <div className="flex items-center gap-2">
+              <div className="flex justify-between items-start border-b border-brand-charcoal/5 pb-3">
+                <div className="flex flex-col min-w-0 flex-1">
                   <span className="font-bold text-2xl text-brand-navy font-serif">{player.name}</span>
-                  {isDealer && <Badge className="bg-brand-teal text-white text-xs">{t('dealer')}</Badge>}
-                  {targetRoundNum > 1 && (
-                    <span className={`text-xs font-mono font-bold ${lastRoundSnapshot >= 0 ? 'text-brand-slate' : 'text-brand-oxblood'}`}>
-                      ({lastRoundSnapshot > 0 ? '+' : ''}{lastRoundSnapshot}pts)
-                    </span>
+                  {(isDealer || targetRoundNum > 1) && (
+                    <div className="flex items-center gap-2 mt-0.5">
+                      {isDealer && <Badge className="bg-brand-teal text-white text-xs">{t('dealer')}</Badge>}
+                      {targetRoundNum > 1 && (
+                        <span className={`text-xs font-mono font-bold ${lastRoundSnapshot >= 0 ? 'text-brand-slate' : 'text-brand-oxblood'}`}>
+                          ({lastRoundSnapshot > 0 ? '+' : ''}{lastRoundSnapshot}pts)
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs text-brand-slate uppercase font-bold tracking-wider">{t('bid')}</span>
                   <span className={`text-xl font-mono font-bold px-4 py-1 rounded-lg bg-brand-navy border border-brand-teal/20 ${bid === 0 ? 'text-brand-teal' : 'text-white'}`}>
                     {bid}
