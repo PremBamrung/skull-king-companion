@@ -4,7 +4,7 @@ import { translations } from '../i18n';
 import { Card, Button, Badge, cn } from './UI';
 import { Minus, Plus, ChevronRight } from 'lucide-react';
 
-export default function ResolutionPhase({ game, bids, tricks, bonuses, kraken, setTricks, setBonuses, setKraken, dealerIndex, editingRoundNum, currentRound, onBack, onSubmit }) {
+export default function ResolutionPhase({ game, bids, tricks, bonuses, kraken, setTricks, setBonuses, setKraken, dealerIndex, editingRoundNum, currentRound, onBack, onSubmit, submitting }) {
   const { language } = useGameStore();
   const t = (key) => translations[language][key] || key;
 
@@ -118,7 +118,7 @@ export default function ResolutionPhase({ game, bids, tricks, bonuses, kraken, s
           </Button>
           <Button
             onClick={onSubmit}
-            disabled={isSubmitDisabled}
+            disabled={isSubmitDisabled || submitting}
             className="flex-[2] lg:flex-none lg:w-auto lg:px-12 text-xl shadow-xl"
           >
             {editingRoundNum ? t('update_round') : `${t('finish_round')} ${currentRound.round_number}`} <ChevronRight size={24} />

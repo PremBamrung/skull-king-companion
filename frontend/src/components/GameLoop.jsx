@@ -18,6 +18,7 @@ export default function GameLoop({ game, onExit, setGame }) {
   const [localPhase, setLocalPhase] = useState('BID');
   const [editingRoundNum, setEditingRoundNum] = useState(null);
   const [showGraph, setShowGraph] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const currentRound = game?.rounds?.find(r => !r.player_stats || r.player_stats.length === 0)
     || game?.rounds?.[game?.rounds?.length - 1];
@@ -39,6 +40,8 @@ export default function GameLoop({ game, onExit, setGame }) {
   }
 
   const submitGameRound = async () => {
+    if (submitting) return;
+    setSubmitting(true);
     try {
       const stats = game.players.map(p => ({
         player_id: p.id,
@@ -47,17 +50,19 @@ export default function GameLoop({ game, onExit, setGame }) {
         bonus: bonuses[p.id] || 0
       }));
 
-      let updated;
       if (editingRoundNum) {
-        updated = await api.updateRound(game.id, editingRoundNum, stats, kraken);
+        await api.updateRound(game.id, editingRoundNum, stats, kraken);
         setEditingRoundNum(null);
       } else {
-        updated = await api.submitRound(game.id, currentRound.round_number, stats, kraken);
+        await api.submitRound(game.id, currentRound.round_number, stats, kraken);
       }
+      const updated = await api.getGame(game.id);
       setGame(updated);
       setLocalPhase('BID');
     } catch (e) {
       alert(e.response?.data?.detail || 'Error submitting round');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -167,6 +172,7 @@ export default function GameLoop({ game, onExit, setGame }) {
             currentRound={currentRound}
             onBack={() => setLocalPhase('BID')}
             onSubmit={submitGameRound}
+            submitting={submitting}
           />
         )}
       </main>

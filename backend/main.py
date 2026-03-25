@@ -154,12 +154,19 @@ def submit_round(
     if not round_obj:
         raise HTTPException(status_code=404, detail="Round not found")
 
+    # Guard against duplicate submissions
+    existing_stats = session.exec(
+        select(RoundPlayerStats).where(RoundPlayerStats.round_id == round_obj.id)
+    ).first()
+    if existing_stats:
+        raise HTTPException(status_code=409, detail="Round already submitted. Use PUT to update.")
+
     # Validation
     total_tricks = sum(p.tricks for p in data.player_stats)
     expected_tricks = round_obj.card_count - 1 if data.kraken_played else round_obj.card_count
     if total_tricks != expected_tricks:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail=f"Total tricks ({total_tricks}) does not match expected ({expected_tricks})."
         )
 
@@ -188,8 +195,12 @@ def submit_round(
 
     # Advance game
     if round_num < 10:
-        next_round = Round(game_id=game_id, round_number=round_num + 1, card_count=round_num + 1)
-        session.add(next_round)
+        existing_next = session.exec(
+            select(Round).where(Round.game_id == game_id, Round.round_number == round_num + 1)
+        ).first()
+        if not existing_next:
+            next_round = Round(game_id=game_id, round_number=round_num + 1, card_count=round_num + 1)
+            session.add(next_round)
     else:
         game.status = GameStatus.COMPLETED
 
