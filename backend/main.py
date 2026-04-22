@@ -11,6 +11,7 @@ from models import Game, Player, Round, RoundPlayerStats, GameStatus
 from scoring import ScoringService
 from pydantic import BaseModel
 from seed import seed_data
+from names import generate_game_name
 
 # Response Models with Relationships
 class RoundPlayerStatsRead(BaseModel):
@@ -39,6 +40,7 @@ class PlayerRead(BaseModel):
 class GameRead(BaseModel):
     id: UUID
     status: GameStatus
+    name: Optional[str] = None
     created_at: datetime
     last_accessed: datetime
     rules_config: Dict
@@ -82,13 +84,23 @@ class RoundSubmit(BaseModel):
     player_stats: List[PlayerStatInput]
     kraken_played: bool = False
 
+def _get_prev_total(session: Session, game_id: UUID, player_id: UUID, before_round_num: int) -> int:
+    statement = select(RoundPlayerStats).join(Round).where(
+        Round.game_id == game_id,
+        Round.round_number < before_round_num,
+        RoundPlayerStats.player_id == player_id
+    ).order_by(Round.round_number.desc())
+    last_stat = session.exec(statement).first()
+    return last_stat.total_score_snapshot if last_stat else 0
+
+
 @app.get("/")
 async def root():
     return {"message": "Skull King API"}
 
 @app.post("/api/games", response_model=GameRead)
 def create_game(data: GameCreate, session: Session = Depends(get_session)):
-    game = Game(status=GameStatus.ACTIVE, rules_config=data.config)
+    game = Game(status=GameStatus.ACTIVE, rules_config=data.config, name=generate_game_name())
     session.add(game)
     session.commit()
     session.refresh(game)
@@ -142,12 +154,19 @@ def submit_round(
     if not round_obj:
         raise HTTPException(status_code=404, detail="Round not found")
 
+    # Guard against duplicate submissions
+    existing_stats = session.exec(
+        select(RoundPlayerStats).where(RoundPlayerStats.round_id == round_obj.id)
+    ).first()
+    if existing_stats:
+        raise HTTPException(status_code=409, detail="Round already submitted. Use PUT to update.")
+
     # Validation
     total_tricks = sum(p.tricks for p in data.player_stats)
     expected_tricks = round_obj.card_count - 1 if data.kraken_played else round_obj.card_count
     if total_tricks != expected_tricks:
         raise HTTPException(
-            status_code=400, 
+            status_code=400,
             detail=f"Total tricks ({total_tricks}) does not match expected ({expected_tricks})."
         )
 
@@ -162,17 +181,7 @@ def submit_round(
             rules=game.rules_config
         )
         
-        # Get previous total score snapshot
-        prev_total = 0
-        statement = select(RoundPlayerStats).join(Round).where(
-            Round.game_id == game_id,
-            Round.round_number < round_num,
-            RoundPlayerStats.player_id == p_stat.player_id
-        ).order_by(Round.round_number.desc())
-        last_stat = session.exec(statement).first()
-        if last_stat:
-            prev_total = last_stat.total_score_snapshot
-
+        prev_total = _get_prev_total(session, game_id, p_stat.player_id, round_num)
         stat_obj = RoundPlayerStats(
             round_id=round_obj.id,
             player_id=p_stat.player_id,
@@ -186,8 +195,12 @@ def submit_round(
 
     # Advance game
     if round_num < 10:
-        next_round = Round(game_id=game_id, round_number=round_num + 1, card_count=round_num + 1)
-        session.add(next_round)
+        existing_next = session.exec(
+            select(Round).where(Round.game_id == game_id, Round.round_number == round_num + 1)
+        ).first()
+        if not existing_next:
+            next_round = Round(game_id=game_id, round_number=round_num + 1, card_count=round_num + 1)
+            session.add(next_round)
     else:
         game.status = GameStatus.COMPLETED
 
@@ -232,17 +245,7 @@ def update_round(
             round_cards=round_obj.card_count, rules=game.rules_config
         )
         
-        # Get previous total score snapshot
-        prev_total = 0
-        statement = select(RoundPlayerStats).join(Round).where(
-            Round.game_id == game_id,
-            Round.round_number < round_num,
-            RoundPlayerStats.player_id == p_stat.player_id
-        ).order_by(Round.round_number.desc())
-        last_stat = session.exec(statement).first()
-        if last_stat:
-            prev_total = last_stat.total_score_snapshot
-
+        prev_total = _get_prev_total(session, game_id, p_stat.player_id, round_num)
         stat_obj = RoundPlayerStats(
             round_id=round_obj.id, player_id=p_stat.player_id,
             bid=p_stat.bid, tricks_won=p_stat.tricks, bonus_points=p_stat.bonus,
@@ -264,14 +267,8 @@ def update_round(
             break
             
         for s in nxt_round.player_stats:
-            # prev total for THIS player
-            statement = select(RoundPlayerStats).join(Round).where(
-                Round.game_id == game_id,
-                Round.round_number == r_num - 1,
-                RoundPlayerStats.player_id == s.player_id
-            )
-            prev = session.exec(statement).first()
-            s.total_score_snapshot = (prev.total_score_snapshot if prev else 0) + s.round_score
+            prev_total = _get_prev_total(session, game_id, s.player_id, r_num)
+            s.total_score_snapshot = prev_total + s.round_score
             session.add(s)
         session.commit()
 

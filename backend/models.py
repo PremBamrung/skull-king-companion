@@ -16,6 +16,7 @@ class Game(SQLModel, table=True):
     status: GameStatus = Field(default=GameStatus.SETUP)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     last_accessed: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    name: Optional[str] = Field(default=None)
     rules_config: Dict = Field(default={}, sa_column=Column(JSON))
     
     players: List["Player"] = Relationship(back_populates="game", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
