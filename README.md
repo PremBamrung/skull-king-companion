@@ -57,8 +57,8 @@ The easiest way to get the app running is using Docker Compose:
 
 2.  Access the application:
     -   **Frontend**: [http://localhost:5173](http://localhost:5173)
-    -   **Backend API**: [http://localhost:8000](http://localhost:8000)
-    -   **API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs)
+    -   **Backend API**: [http://localhost:8001](http://localhost:8001)
+    -   **API Docs**: [http://localhost:8001/docs](http://localhost:8001/docs)
 
 ### Local Development
 
