@@ -92,7 +92,14 @@ export default function GameLoop({ game, onExit, setGame }) {
   };
 
   if (game.status === 'COMPLETED' && !editingRoundNum) {
-    return <GameOverView game={game} onExit={onExit} onStartEditRound={startEditRound} />;
+    return (
+      <GameOverView
+        game={game}
+        onExit={onExit}
+        onStartEditRound={startEditRound}
+        isRefreshing={submitting}
+      />
+    );
   }
 
   const dealerIndex = (activeRoundNum - 1) % game.players.length;
