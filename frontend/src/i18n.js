@@ -49,8 +49,76 @@ export const translations = {
     
     // Game Over
     captain_of_seas: "Captain of the Seas",
+    captains_of_seas: "Captains of the Seas",
     return_to_port: "Return to Port",
-    
+    hero_points_winning_by: "points — winning by",
+    hero_tied_at_the_top: "points — tied at the top",
+    warning_totals_recalculated: "Totals recalculated from each round.",
+    warning_totals_recalculated_detail: "The stored running totals disagree with the round scores, so the round scores were used.",
+
+    // End-of-game dashboard — shared words
+    of: "of",
+    total: "Total",
+    player: "Player",
+    and_conjunction: "&",
+    round_lower: "round",
+    rounds_lower: "rounds",
+    card_lower: "card",
+    cards_lower: "cards",
+    edit_round: "Edit round",
+
+    // Awards (§4.2) — the award name keeps the flavour, the line under it is literal
+    award_most_daring: "Most Daring",
+    award_daring_explain: "of each round's points at stake",
+    award_most_reliable: "Most Reliable",
+    award_reliable_explain: "bids made",
+    award_treasure_lost: "Treasure Lost",
+    award_treasure_lost_explain: "bonus points lost to missed bids",
+    award_treasure_hunter: "Treasure Hunter",
+    award_treasure_hunter_explain: "bonus points kept",
+    award_biggest_haul: "Biggest Haul",
+    award_deepest_hole: "Deepest Hole",
+    award_points_in_round: "points in round",
+    award_ghost: "Ghost",
+    award_ghost_explain: "zero bids made",
+    award_held_the_lead: "Held the Lead",
+    award_lead_explain: "rounds in front",
+
+    // Point progression annotations (§4.1)
+    one_lead_change: "1 lead change",
+    lead_changes: "lead changes",
+
+    // Daring vs delivery (§4.3)
+    daring_vs_delivery: "Daring vs Delivery",
+    axis_points_at_stake: "Points at stake each round",
+    axis_bids_made: "Bids made",
+    tooltip_points_at_stake: "of the round's points at stake",
+    tooltip_bids_made: "bids made",
+    quadrant_captain: "CAPTAIN",
+    quadrant_cautious: "CAUTIOUS",
+    quadrant_adrift: "ADRIFT",
+    quadrant_reckless: "RECKLESS",
+
+    // Bid too high / too low (§4.4)
+    bid_too_high_or_low: "Bid Too High or Too Low",
+    legend_bid_too_low: "bid too low",
+    legend_bid_too_high: "bid too high",
+    tooltip_overbid_by: "bid too high by",
+    tooltip_underbid_by: "bid too low by",
+    tooltip_bid_exactly: "bid exactly right on average",
+    tooltip_tricks_per_round: "tricks per round",
+
+    // Where points came from (§4.5)
+    where_points_came_from: "Where Points Came From",
+    legend_bid_points: "bid points",
+    legend_bonus_banked: "bonus kept",
+    legend_penalties: "penalties",
+
+    // Full scoresheet (§4.6)
+    full_scoresheet: "Full Scoresheet",
+    scoresheet_key_cell: "Each cell: tricks won / bid, then the points for that round.",
+    scoresheet_key_bonus: "A third line is bonus points — kept (+) or lost (×).",
+
     // Rules Modal
     hierarchy: "Card Hierarchy",
     suits: "Suits (1-14)",
@@ -160,8 +228,76 @@ export const translations = {
     
     // Game Over
     captain_of_seas: "Capitaine des Mers",
+    captains_of_seas: "Capitaines des Mers",
     return_to_port: "Retour au Port",
-    
+    hero_points_winning_by: "points — avec une avance de",
+    hero_tied_at_the_top: "points — égalité en tête",
+    warning_totals_recalculated: "Totaux recalculés à partir de chaque manche.",
+    warning_totals_recalculated_detail: "Les totaux enregistrés ne correspondent pas aux scores des manches ; ce sont les scores des manches qui ont été utilisés.",
+
+    // End-of-game dashboard — shared words
+    of: "sur",
+    total: "Total",
+    player: "Joueur",
+    and_conjunction: "et",
+    round_lower: "manche",
+    rounds_lower: "manches",
+    card_lower: "carte",
+    cards_lower: "cartes",
+    edit_round: "Modifier la manche",
+
+    // Awards (§4.2) — the award name keeps the flavour, the line under it is literal
+    award_most_daring: "Le Plus Audacieux",
+    award_daring_explain: "des points en jeu à chaque manche",
+    award_most_reliable: "Le Plus Fiable",
+    award_reliable_explain: "enchères réussies",
+    award_treasure_lost: "Trésor Perdu",
+    award_treasure_lost_explain: "points bonus perdus sur des enchères ratées",
+    award_treasure_hunter: "Chasseur de Trésor",
+    award_treasure_hunter_explain: "points bonus conservés",
+    award_biggest_haul: "Plus Grosse Prise",
+    award_deepest_hole: "Plus Grand Naufrage",
+    award_points_in_round: "points à la manche",
+    award_ghost: "Fantôme",
+    award_ghost_explain: "enchères zéro réussies",
+    award_held_the_lead: "En Tête",
+    award_lead_explain: "manches passées en tête",
+
+    // Point progression annotations (§4.1)
+    one_lead_change: "1 changement de tête",
+    lead_changes: "changements de tête",
+
+    // Daring vs delivery (§4.3)
+    daring_vs_delivery: "Audace et Résultat",
+    axis_points_at_stake: "Points en jeu par manche",
+    axis_bids_made: "Enchères réussies",
+    tooltip_points_at_stake: "des points en jeu de la manche",
+    tooltip_bids_made: "enchères réussies",
+    quadrant_captain: "CAPITAINE",
+    quadrant_cautious: "PRUDENT",
+    quadrant_adrift: "À LA DÉRIVE",
+    quadrant_reckless: "TÉMÉRAIRE",
+
+    // Bid too high / too low (§4.4)
+    bid_too_high_or_low: "Enchères Trop Hautes ou Trop Basses",
+    legend_bid_too_low: "enchère trop basse",
+    legend_bid_too_high: "enchère trop haute",
+    tooltip_overbid_by: "a enchéri trop haut de",
+    tooltip_underbid_by: "a enchéri trop bas de",
+    tooltip_bid_exactly: "enchères justes en moyenne",
+    tooltip_tricks_per_round: "plis par manche",
+
+    // Where points came from (§4.5)
+    where_points_came_from: "D'où Viennent les Points",
+    legend_bid_points: "points d'enchère",
+    legend_bonus_banked: "bonus conservés",
+    legend_penalties: "pénalités",
+
+    // Full scoresheet (§4.6)
+    full_scoresheet: "Feuille de Score Complète",
+    scoresheet_key_cell: "Chaque case : plis gagnés / enchère, puis les points de la manche.",
+    scoresheet_key_bonus: "Une troisième ligne indique les bonus — conservés (+) ou perdus (×).",
+
     // Rules Modal
     hierarchy: "Hiérarchie des Cartes",
     suits: "Couleurs (1-14)",
